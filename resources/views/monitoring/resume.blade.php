@@ -5,7 +5,7 @@
 {{-- ============================================================
      MONITORING MATERIAL - RESUME
      Rata-rata durasi per TAHAPAN PROSES per jenis Pengadaan:
-       Notifikasi → Reservasi → PR → PO → Est. Complete
+       Notifikasi → Reservasi → PR → PO → Est. Complete → MSO Finish
      ============================================================ --}}
 
 <style>
@@ -25,6 +25,7 @@
         --c-rsv:      #7C3AED;
         --c-pr:       #D97706;
         --c-po:       #16a34a;
+        --c-mso:      #0891B2;
         --c-total:    #DC2626;
     }
 
@@ -88,17 +89,32 @@
         margin-bottom: 0.5rem;
     }
 
-    .filter-select {
+    .filter-input, .filter-select {
         border: 2px solid var(--light-gray);
         padding: 0.65rem 1rem;
         border-radius: 8px;
         font-size: 0.875rem;
         color: var(--dark-gray);
         background: var(--pure-white);
-        min-width: 160px;
         transition: all 0.3s ease;
     }
-    .filter-select:focus { outline: none; border-color: var(--primary-red); box-shadow: 0 0 0 3px var(--light-red); }
+    .filter-input { min-width: 160px; }
+    .filter-select { min-width: 160px; }
+    .filter-input:focus, .filter-select:focus {
+        outline: none;
+        border-color: var(--primary-red);
+        box-shadow: 0 0 0 3px var(--light-red);
+    }
+
+    /* Separator "s/d" antar tanggal */
+    .date-range-sep {
+        font-size: 0.813rem;
+        font-weight: 600;
+        color: var(--medium-gray);
+        padding-bottom: 0.2rem;
+        align-self: flex-end;
+        padding: 0.65rem 0.25rem;
+    }
 
     .btn-filter {
         background: var(--primary-red);
@@ -133,6 +149,21 @@
     }
     .btn-reset:hover { background: var(--dark-gray); transform: translateY(-2px); color: var(--pure-white); }
 
+    /* Active filter badge */
+    .active-filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        background: #FEF3C7;
+        border: 1px solid #FCD34D;
+        color: #92400E;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 0.75rem;
+    }
+
     /* === PIPELINE HEADER === */
     .pipeline-banner {
         background: var(--pure-white);
@@ -147,7 +178,7 @@
         display: flex;
         align-items: center;
         gap: 0;
-        min-width: 600px;
+        min-width: 700px;
     }
 
     .pipeline-step {
@@ -213,15 +244,15 @@
         padding: 0 4px;
     }
 
-    /* === STAT CARDS (5 tahapan) === */
+    /* === STAT CARDS (6 tahapan) === */
     .stage-cards {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: 1rem;
         margin-bottom: 2rem;
     }
 
-    @media (max-width: 1200px) { .stage-cards { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 1400px) { .stage-cards { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 768px)  { .stage-cards { grid-template-columns: 1fr 1fr; } }
 
     .stage-card {
@@ -301,15 +332,6 @@
         position: relative;
     }
 
-    /* Span full width */
-    .chart-card-full {
-        background: var(--pure-white);
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        overflow: hidden;
-        margin-bottom: 2rem;
-    }
-
     /* === SUMMARY TABLE === */
     .summary-wrap {
         overflow-x: auto;
@@ -323,7 +345,7 @@
         border-collapse: separate;
         border-spacing: 0;
         background: var(--pure-white);
-        min-width: 900px;
+        min-width: 1100px;
     }
 
     .summary-table thead {
@@ -369,29 +391,9 @@
         color: var(--pure-white);
     }
 
-    /* Sel durasi tahapan */
     .dur-cell {
         text-align: center;
         border-left: 1px solid var(--light-gray);
-    }
-
-    .dur-badge {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-    }
-
-    .dur-avg {
-        font-size: 1rem;
-        font-weight: 800;
-        line-height: 1;
-    }
-
-    .dur-meta {
-        font-size: 0.65rem;
-        color: var(--medium-gray);
-        white-space: nowrap;
     }
 
     .dur-na {
@@ -420,6 +422,21 @@
         gap: 0.5rem;
         line-height: 1.6;
     }
+
+    /* MSO highlight note */
+    .mso-note {
+        background: #ECFEFF;
+        border-left: 4px solid #0891B2;
+        color: #164E63;
+        padding: 0.875rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.813rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        line-height: 1.6;
+    }
 </style>
 
 <div class="mon-container">
@@ -428,7 +445,7 @@
     <div class="page-header">
         <div>
             <h1 class="page-title">📊 Resume Lead Time Pengadaan Material</h1>
-            <p class="page-subtitle">Rata-rata durasi per tahapan proses: Notifikasi → Reservasi → PR → PO → Est. Complete</p>
+            <p class="page-subtitle">Rata-rata durasi per tahapan proses: Notifikasi → Reservasi → PR → PO → Est. Complete → MSO Finish</p>
         </div>
         <a href="{{ route('monitoring.index') }}" class="btn-back">← Kembali</a>
     </div>
@@ -436,24 +453,31 @@
     {{-- FILTER --}}
     <div class="filter-container">
         <form method="GET" action="{{ route('monitoring.resume') }}" style="display:flex; align-items:flex-end; gap:1rem; flex-wrap:wrap;">
+
+            {{-- Range Tanggal --}}
             <div>
-                <label class="filter-label">📅 Tahun</label>
-                <select name="tahun" class="filter-select">
-                    <option value="">Semua Tahun</option>
-                    @foreach($tahunList as $t)
-                        <option value="{{ $t }}" {{ request('tahun') == $t ? 'selected' : '' }}>{{ $t }}</option>
-                    @endforeach
-                </select>
+                <label class="filter-label">📅 Tanggal Dari</label>
+                <input
+                    type="date"
+                    name="tanggal_dari"
+                    class="filter-input"
+                    value="{{ request('tanggal_dari') }}"
+                >
             </div>
+
+            <div class="date-range-sep">s/d</div>
+
             <div>
-                <label class="filter-label">📆 Bulan</label>
-                <select name="bulan" class="filter-select">
-                    <option value="">Semua Bulan</option>
-                    @foreach($bulanList as $num => $nama)
-                        <option value="{{ $num }}" {{ request('bulan') == $num ? 'selected' : '' }}>{{ $nama }}</option>
-                    @endforeach
-                </select>
+                <label class="filter-label">📅 Tanggal Sampai</label>
+                <input
+                    type="date"
+                    name="tanggal_sampai"
+                    class="filter-input"
+                    value="{{ request('tanggal_sampai') }}"
+                >
             </div>
+
+            {{-- Filter Jenis Pengadaan --}}
             <div>
                 <label class="filter-label">🔖 Pengadaan</label>
                 <select name="pengadaan" class="filter-select">
@@ -463,13 +487,31 @@
                     @endforeach
                 </select>
             </div>
+
             <div style="display:flex; gap:0.75rem;">
                 <button type="submit" class="btn-filter">🔎 Terapkan</button>
-                @if(request()->anyFilled(['tahun','bulan','pengadaan']))
+                @if(request()->anyFilled(['tanggal_dari','tanggal_sampai','pengadaan']))
                     <a href="{{ route('monitoring.resume') }}" class="btn-reset">✖ Reset</a>
                 @endif
             </div>
         </form>
+
+        {{-- Tampilkan rentang aktif jika ada filter --}}
+        @if(request()->anyFilled(['tanggal_dari','tanggal_sampai','pengadaan']))
+            <div style="margin-top:0.75rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+                @if(request('tanggal_dari') || request('tanggal_sampai'))
+                    <span class="active-filter-badge">
+                        📅
+                        {{ request('tanggal_dari') ? \Carbon\Carbon::parse(request('tanggal_dari'))->format('d M Y') : '—' }}
+                        s/d
+                        {{ request('tanggal_sampai') ? \Carbon\Carbon::parse(request('tanggal_sampai'))->format('d M Y') : 'sekarang' }}
+                    </span>
+                @endif
+                @if(request('pengadaan'))
+                    <span class="active-filter-badge">🔖 {{ request('pengadaan') }}</span>
+                @endif
+            </div>
+        @endif
     </div>
 
     {{-- INFO NOTE --}}
@@ -478,6 +520,14 @@
             Durasi setiap interval dihitung dalam <strong>hari kalender</strong>.
             Interval hanya dihitung apabila <strong>kedua tanggal tersedia</strong> di data.
             Data dengan tanggal tidak lengkap dikecualikan dari rata-rata tahap tersebut.
+        </span>
+    </div>
+
+    <div class="mso-note">
+        🔵 <span>
+            Tahapan <strong>Est. Complete → MSO Finish</strong> dihitung dari <code>estimated_delivery</code> (Material Monitoring)
+            ke <code>finish_date</code> (MSO Transaction) berdasarkan kecocokan <code>trans_id</code>.
+            Data hanya muncul apabila MSO terkait sudah memiliki tanggal selesai.
         </span>
     </div>
 
@@ -525,8 +575,17 @@
             </div>
 
             <div class="pipeline-step">
-                <div class="pipeline-dot" style="background:var(--c-total);">✅</div>
+                <div class="pipeline-dot" style="background:var(--c-mso);">📦</div>
                 <div class="pipeline-step-label">Est.<br>Complete</div>
+            </div>
+
+            <div class="pipeline-arrow">
+                <div class="pipeline-arrow-label" style="color:var(--c-mso);">⑤ Est. → MSO</div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="pipeline-dot" style="background:var(--c-total);">✅</div>
+                <div class="pipeline-step-label">MSO<br>Finish</div>
             </div>
 
         </div>
@@ -536,9 +595,23 @@
     <div class="section-title">Rata-rata Keseluruhan per Tahapan</div>
     <div class="stage-cards" style="margin-bottom:2rem;">
         @php
-            $stageIcons  = ['notif_to_reservasi'=>'①','reservasi_to_pr'=>'②','pr_to_po'=>'③','po_to_delivery'=>'④','total_lead'=>'⏱'];
-            $stageBorder = ['notif_to_reservasi'=>'var(--c-notif)','reservasi_to_pr'=>'var(--c-rsv)','pr_to_po'=>'var(--c-pr)','po_to_delivery'=>'var(--c-po)','total_lead'=>'var(--c-total)'];
-            $stageColor  = $stageBorder;
+            $stageIcons  = [
+                'notif_to_reservasi'     => '①',
+                'reservasi_to_pr'        => '②',
+                'pr_to_po'               => '③',
+                'po_to_delivery'         => '④',
+                'delivery_to_mso_finish' => '⑤',
+                'total_lead'             => '⏱',
+            ];
+            $stageBorder = [
+                'notif_to_reservasi'     => 'var(--c-notif)',
+                'reservasi_to_pr'        => 'var(--c-rsv)',
+                'pr_to_po'               => 'var(--c-pr)',
+                'po_to_delivery'         => 'var(--c-po)',
+                'delivery_to_mso_finish' => 'var(--c-mso)',
+                'total_lead'             => 'var(--c-total)',
+            ];
+            $stageColor = $stageBorder;
         @endphp
 
         @foreach($stages as $key => $stage)
@@ -562,7 +635,6 @@
     <div class="section-title">Perbandingan Durasi per Jenis Pengadaan</div>
     <div class="chart-grid-2" style="margin-bottom:2rem;">
 
-        {{-- Grouped Bar: tiap stage per pengadaan --}}
         <div class="chart-card">
             <div class="chart-card-header">📊 Rata-rata Hari per Tahapan & Pengadaan</div>
             <div class="chart-card-body">
@@ -570,7 +642,6 @@
             </div>
         </div>
 
-        {{-- Stacked Bar: komposisi total lead time --}}
         <div class="chart-card">
             <div class="chart-card-header">📐 Komposisi Total Lead Time (Stacked)</div>
             <div class="chart-card-body">
@@ -583,7 +654,6 @@
     {{-- CHART ROW 2: Radar + Trend Bulanan --}}
     <div class="chart-grid-2" style="margin-bottom:2rem;">
 
-        {{-- Radar: profil lead time per pengadaan --}}
         <div class="chart-card">
             <div class="chart-card-header">🕸 Profil Lead Time per Pengadaan (Radar)</div>
             <div class="chart-card-body" style="display:flex; align-items:center; justify-content:center;">
@@ -591,7 +661,6 @@
             </div>
         </div>
 
-        {{-- Line: trend total lead time 12 bulan --}}
         <div class="chart-card">
             <div class="chart-card-header">📈 Trend Total Lead Time (12 Bulan Terakhir)</div>
             <div class="chart-card-body">
@@ -716,7 +785,7 @@ Chart.defaults.color = '#6B7280';
    Setiap dataset = 1 tahapan, berisi nilai avg untuk setiap pengadaan
 */
 function buildGroupedDatasets() {
-    const stageKeys = Object.keys(stageDatasets);
+    const stageKeys   = Object.keys(stageDatasets);
     const stageColors = stagesMeta.map(s => s.color);
 
     return stageKeys.map((key, i) => ({
@@ -755,17 +824,17 @@ new Chart(document.getElementById('chartGrouped'), {
     },
 });
 
-/* ── 2. STACKED BAR — hanya 4 interval pertama (bukan total) ── */
+/* ── 2. STACKED BAR — 5 interval (termasuk delivery_to_mso_finish, bukan total) ── */
 function buildStackedDatasets() {
-    const keys   = ['notif_to_reservasi','reservasi_to_pr','pr_to_po','po_to_delivery'];
-    const labels = stagesMeta.slice(0, 4).map(s => s.short);
-    const colors = stagesMeta.slice(0, 4).map(s => s.color);
+    const keys   = ['notif_to_reservasi','reservasi_to_pr','pr_to_po','po_to_delivery','delivery_to_mso_finish'];
+    const labels = stagesMeta.slice(0, 5).map(s => s.short);
+    const colors = stagesMeta.slice(0, 5).map(s => s.color);
 
     return keys.map((key, i) => ({
         label           : labels[i],
         data            : stageDatasets[key],
         backgroundColor : colors[i],
-        borderRadius    : i === 3 ? { topRight:5, topLeft:0 } : 0,
+        borderRadius    : i === 4 ? { topRight:5, topLeft:0 } : 0,
         borderSkipped   : false,
     }));
 }
@@ -799,10 +868,10 @@ new Chart(document.getElementById('chartStacked'), {
     },
 });
 
-/* ── 3. RADAR ── */
+/* ── 3. RADAR — 5 interval termasuk delivery_to_mso_finish ── */
 {
-    const keys = ['notif_to_reservasi','reservasi_to_pr','pr_to_po','po_to_delivery'];
-    const radarLabels = stagesMeta.slice(0, 4).map(s => s.short);
+    const keys = ['notif_to_reservasi','reservasi_to_pr','pr_to_po','po_to_delivery','delivery_to_mso_finish'];
+    const radarLabels = stagesMeta.slice(0, 5).map(s => s.short);
 
     const radarDatasets = pengadaanLabels.map(peng => {
         const color = (PENG_COLORS[peng] ?? { main:'#6B7280', light:'rgba(107,114,128,0.15)' });

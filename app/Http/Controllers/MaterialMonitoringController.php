@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\MaterialMonitoring;
+use App\Models\MsoTransaction;
 use Carbon\Carbon;
 
 class MaterialMonitoringController extends Controller
@@ -48,11 +49,12 @@ class MaterialMonitoringController extends Controller
      *   [2] Reservasi   → PR            : tanggal_reservasi → tanggal_pr
      *   [3] PR          → PO            : tanggal_pr        → tanggal_po
      *   [4] PO          → Est. Complete : tanggal_po        → estimated_delivery
-     *   [5] Total Lead  → End           : tanggal           → estimated_delivery
+     *   [5] Est. Complete → MSO Finish  : estimated_delivery → mso_finish_date (dari MsoTransaction)
+     *   [6] Total Lead  → End           : tanggal           → estimated_delivery
      *
      * Setiap interval hanya dihitung jika KEDUA tanggal tersedia.
      * Hasilnya dikelompokkan per jenis Pengadaan.
-     * Filter: tahun (dari kolom tanggal), dan/atau jenis pengadaan.
+     * Filter: tanggal dari s/d tanggal (dari kolom tanggal), dan/atau jenis pengadaan.
      * ============================================================
      */
     public function resume(Request $request)
@@ -60,17 +62,29 @@ class MaterialMonitoringController extends Controller
         /* ── Query dasar ── */
         $query = MaterialMonitoring::query();
 
-        if ($request->filled('tahun')) {
-            $query->whereYear('tanggal', $request->tahun);
+        // Filter range tanggal (menggantikan filter tahun & bulan)
+        if ($request->filled('tanggal_dari')) {
+            $query->whereDate('tanggal', '>=', $request->tanggal_dari);
         }
-        if ($request->filled('bulan')) {
-            $query->whereMonth('tanggal', $request->bulan);
+        if ($request->filled('tanggal_sampai')) {
+            $query->whereDate('tanggal', '<=', $request->tanggal_sampai);
         }
         if ($request->filled('pengadaan')) {
             $query->where('pengadaan', $request->pengadaan);
         }
 
         $all = $query->get();
+
+        /* ── Ambil finish_date dari MsoTransaction berdasarkan trans_id = id_trans ── */
+        $transIds = $all->pluck('trans_id')->unique()->filter()->values();
+
+        // Map: id_trans => finish_date (ambil finish_date terbaru jika ada beberapa)
+        $msoFinishMap = MsoTransaction::whereIn('id_trans', $transIds)
+            ->whereNotNull('finish_date')
+            ->orderBy('finish_date', 'desc')
+            ->get()
+            ->groupBy('id_trans')
+            ->map(fn($group) => $group->first()->finish_date);
 
         /* ── Urutan jenis pengadaan ── */
         $jenisUrut = ['Jasa', 'Barang-Jasa', 'Via Peng.Barang', 'Via Capex'];
@@ -83,6 +97,7 @@ class MaterialMonitoringController extends Controller
                 'to'     => 'tanggal_reservasi',
                 'short'  => 'Notif → RSV',
                 'color'  => '#2563EB',
+                'virtual' => false,
             ],
             'reservasi_to_pr' => [
                 'label'  => 'Reservasi → PR',
@@ -90,6 +105,7 @@ class MaterialMonitoringController extends Controller
                 'to'     => 'tanggal_pr',
                 'short'  => 'RSV → PR',
                 'color'  => '#7C3AED',
+                'virtual' => false,
             ],
             'pr_to_po' => [
                 'label'  => 'PR → PO',
@@ -97,6 +113,7 @@ class MaterialMonitoringController extends Controller
                 'to'     => 'tanggal_po',
                 'short'  => 'PR → PO',
                 'color'  => '#D97706',
+                'virtual' => false,
             ],
             'po_to_delivery' => [
                 'label'  => 'PO → Est. Complete',
@@ -104,6 +121,15 @@ class MaterialMonitoringController extends Controller
                 'to'     => 'estimated_delivery',
                 'short'  => 'PO → Est.',
                 'color'  => '#16a34a',
+                'virtual' => false,
+            ],
+            'delivery_to_mso_finish' => [
+                'label'  => 'Est. Complete → MSO Finish',
+                'from'   => 'estimated_delivery',
+                'to'     => 'mso_finish_date',   // kolom virtual, diisi manual
+                'short'  => 'Est. → MSO',
+                'color'  => '#0891B2',
+                'virtual' => true,               // ditangani khusus
             ],
             'total_lead' => [
                 'label'  => 'Total Lead Time',
@@ -111,6 +137,7 @@ class MaterialMonitoringController extends Controller
                 'to'     => 'estimated_delivery',
                 'short'  => 'Total',
                 'color'  => '#DC2626',
+                'virtual' => false,
             ],
         ];
 
@@ -123,12 +150,14 @@ class MaterialMonitoringController extends Controller
 
             $diff = Carbon::parse($dateFrom)->diffInDays(Carbon::parse($dateTo), false);
 
-            // Abaikan jika urutan terbalik (data tidak valid)
             return $diff >= 0 ? (int) $diff : null;
         };
 
-        /* ── Hitung per baris semua interval ── */
-        $allWithIntervals = $all->map(function ($row) use ($stages, $calcDays) {
+        /* ── Hitung per baris semua interval (termasuk virtual delivery_to_mso_finish) ── */
+        $allWithIntervals = $all->map(function ($row) use ($stages, $calcDays, $msoFinishMap) {
+            // Sisipkan mso_finish_date ke object row secara virtual
+            $row->mso_finish_date = $msoFinishMap->get($row->trans_id);
+
             foreach ($stages as $key => $stage) {
                 $row->{"dur_{$key}"} = $calcDays($row, $stage['from'], $stage['to']);
             }
@@ -140,10 +169,8 @@ class MaterialMonitoringController extends Controller
 
         $tableSummary  = [];
         $chartLabels   = [];
-        $chartDatasets = [];          // per stage → array nilai rata-rata
-        $chartDatasetsTrend = [];     // untuk trend bulanan
+        $chartDatasets = [];
 
-        // Inisialisasi dataset per stage
         foreach ($stages as $key => $stage) {
             $chartDatasets[$key] = [];
         }
@@ -163,7 +190,7 @@ class MaterialMonitoringController extends Controller
                     'avg'   => $values->count() > 0 ? round($values->avg(), 1) : null,
                     'max'   => $values->count() > 0 ? $values->max() : null,
                     'min'   => $values->count() > 0 ? $values->min() : null,
-                    'count' => $values->count(),  // berapa baris yang punya kedua tanggal
+                    'count' => $values->count(),
                 ];
 
                 $chartDatasets[$key][] = $rowData[$key]['avg'];
@@ -173,19 +200,19 @@ class MaterialMonitoringController extends Controller
         }
 
         /* ── Trend bulanan (12 bulan terakhir) ── */
-        // Untuk setiap bulan → rata-rata total_lead per pengadaan
         $trend = $this->buildMonthlyTrend($allWithIntervals, $jenisUrut);
 
         /* ── Stat cards keseluruhan (tidak difilter pengadaan) ── */
         $overallQuery = MaterialMonitoring::query();
-        if ($request->filled('tahun')) {
-            $overallQuery->whereYear('tanggal', $request->tahun);
+        if ($request->filled('tanggal_dari')) {
+            $overallQuery->whereDate('tanggal', '>=', $request->tanggal_dari);
         }
-        if ($request->filled('bulan')) {
-            $overallQuery->whereMonth('tanggal', $request->bulan);
+        if ($request->filled('tanggal_sampai')) {
+            $overallQuery->whereDate('tanggal', '<=', $request->tanggal_sampai);
         }
 
-        $overallAll = $overallQuery->get()->map(function ($row) use ($stages, $calcDays) {
+        $overallAll = $overallQuery->get()->map(function ($row) use ($stages, $calcDays, $msoFinishMap) {
+            $row->mso_finish_date = $msoFinishMap->get($row->trans_id);
             foreach ($stages as $key => $stage) {
                 $row->{"dur_{$key}"} = $calcDays($row, $stage['from'], $stage['to']);
             }
@@ -202,20 +229,7 @@ class MaterialMonitoringController extends Controller
         }
         $stats['total_records'] = $overallAll->count();
 
-        /* ── Daftar tahun & bulan untuk filter ── */
-        $tahunList = MaterialMonitoring::selectRaw('YEAR(tanggal) as tahun')
-                        ->whereNotNull('tanggal')
-                        ->distinct()
-                        ->orderBy('tahun', 'desc')
-                        ->pluck('tahun');
-
-        $bulanList = [
-            1=>'Januari', 2=>'Februari', 3=>'Maret', 4=>'April',
-            5=>'Mei', 6=>'Juni', 7=>'Juli', 8=>'Agustus',
-            9=>'September', 10=>'Oktober', 11=>'November', 12=>'Desember',
-        ];
-
-        /* ── stagesJs: versi ringan untuk JS (tanpa key 'from'/'to') ── */
+        /* ── stagesJs: versi ringan untuk JS ── */
         $stagesJs = array_values(array_map(fn($s) => [
             'label' => $s['label'],
             'short' => $s['short'],
@@ -230,14 +244,11 @@ class MaterialMonitoringController extends Controller
             'chartLabels',
             'chartDatasets',
             'trend',
-            'tahunList',
-            'bulanList'
         ));
     }
 
     /**
      * Build data trend bulanan: 12 bulan terakhir
-     * Return: ['labels' => [...], 'datasets' => [ pengadaan => [avg_total_lead, ...] ]]
      */
     private function buildMonthlyTrend($allWithIntervals, array $jenisUrut): array
     {
