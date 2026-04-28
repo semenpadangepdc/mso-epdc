@@ -52,6 +52,8 @@ class Operation extends \Google\Collection
   public $endTime;
   protected $errorType = OperationError::class;
   protected $errorDataType = '';
+  protected $getVersionOperationMetadataType = GetVersionOperationMetadata::class;
+  protected $getVersionOperationMetadataDataType = '';
   /**
    * [Output Only] If the operation fails, this field contains the HTTP error
    * message that was returned, such as `NOT FOUND`.
@@ -84,8 +86,8 @@ class Operation extends \Google\Collection
   protected $instancesBulkInsertOperationMetadataType = InstancesBulkInsertOperationMetadata::class;
   protected $instancesBulkInsertOperationMetadataDataType = '';
   /**
-   * [Output Only] Type of the resource. Always `compute#operation` for
-   * Operation resources.
+   * Output only. [Output Only] Type of the resource. Always `compute#operation`
+   * for Operation resources.
    *
    * @var string
    */
@@ -97,8 +99,8 @@ class Operation extends \Google\Collection
    */
   public $name;
   /**
-   * [Output Only] An ID that represents a group of operations, such as when a
-   * group of operations results from a `bulkInsert` API request.
+   * Output only. [Output Only] An ID that represents a group of operations,
+   * such as when a group of operations results from a `bulkInsert` API request.
    *
    * @var string
    */
@@ -274,6 +276,20 @@ class Operation extends \Google\Collection
     return $this->error;
   }
   /**
+   * @param GetVersionOperationMetadata $getVersionOperationMetadata
+   */
+  public function setGetVersionOperationMetadata(GetVersionOperationMetadata $getVersionOperationMetadata)
+  {
+    $this->getVersionOperationMetadata = $getVersionOperationMetadata;
+  }
+  /**
+   * @return GetVersionOperationMetadata
+   */
+  public function getGetVersionOperationMetadata()
+  {
+    return $this->getVersionOperationMetadata;
+  }
+  /**
    * [Output Only] If the operation fails, this field contains the HTTP error
    * message that was returned, such as `NOT FOUND`.
    *
@@ -357,8 +373,8 @@ class Operation extends \Google\Collection
     return $this->instancesBulkInsertOperationMetadata;
   }
   /**
-   * [Output Only] Type of the resource. Always `compute#operation` for
-   * Operation resources.
+   * Output only. [Output Only] Type of the resource. Always `compute#operation`
+   * for Operation resources.
    *
    * @param string $kind
    */
@@ -390,8 +406,8 @@ class Operation extends \Google\Collection
     return $this->name;
   }
   /**
-   * [Output Only] An ID that represents a group of operations, such as when a
-   * group of operations results from a `bulkInsert` API request.
+   * Output only. [Output Only] An ID that represents a group of operations,
+   * such as when a group of operations results from a `bulkInsert` API request.
    *
    * @param string $operationGroupId
    */
@@ -477,9 +493,9 @@ class Operation extends \Google\Collection
     return $this->selfLink;
   }
   /**
-   * [Output Only] If the operation is for projects.setCommonInstanceMetadata,
-   * this field will contain information on all underlying zonal actions and
-   * their state.
+   * Output only. [Output Only] If the operation is for
+   * projects.setCommonInstanceMetadata, this field will contain information on
+   * all underlying zonal actions and their state.
    *
    * @param SetCommonInstanceMetadataOperationMetadata $setCommonInstanceMetadataOperationMetadata
    */

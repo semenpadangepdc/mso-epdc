@@ -158,6 +158,25 @@ class Instances extends \Google\Service\Resource
     return $this->call('acquireSsrsLease', [$params], SqlInstancesAcquireSsrsLeaseResponse::class);
   }
   /**
+   * Adds a new Entra ID certificate for the specified instance. If an Entra ID
+   * certificate was previously added but never used in a certificate rotation,
+   * this operation replaces that version. (instances.addEntraIdCertificate)
+   *
+   * @param string $project Required. Project ID of the project that contains the
+   * instance.
+   * @param string $instance Required. Cloud SQL instance ID. This does not
+   * include the project ID.
+   * @param array $optParams Optional parameters.
+   * @return Operation
+   * @throws \Google\Service\Exception
+   */
+  public function addEntraIdCertificate($project, $instance, $optParams = [])
+  {
+    $params = ['project' => $project, 'instance' => $instance];
+    $params = array_merge($params, $optParams);
+    return $this->call('addEntraIdCertificate', [$params], Operation::class);
+  }
+  /**
    * Adds a new trusted Certificate Authority (CA) version for the specified
    * instance. Required to prepare for a certificate rotation. If a CA version was
    * previously added but never used in a certificate rotation, this operation
@@ -205,8 +224,7 @@ class Instances extends \Google\Service\Resource
    * Creates a Cloud SQL instance as a clone of the source instance. Using this
    * operation might cause your instance to restart. (instances.cloneInstances)
    *
-   * @param string $project Required. Project ID of the source as well as the
-   * clone Cloud SQL instance.
+   * @param string $project Required. Project ID of the source Cloud SQL instance.
    * @param string $instance Required. The ID of the Cloud SQL instance to be
    * cloned (source). This does not include the project ID.
    * @param InstancesCloneRequest $postBody

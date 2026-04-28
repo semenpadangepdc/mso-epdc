@@ -28,6 +28,13 @@ class Workspace extends \Google\Model
   protected $dataEncryptionStateType = DataEncryptionState::class;
   protected $dataEncryptionStateDataType = '';
   /**
+   * Optional. If set to true, workspaces will not be moved if its linked
+   * Repository is moved. Instead, it will be deleted.
+   *
+   * @var bool
+   */
+  public $disableMoves;
+  /**
    * Output only. All the metadata information that is used internally to serve
    * the resource. For example: timestamps, flags, status fields, etc. The
    * format of this field is a JSON string.
@@ -41,6 +48,8 @@ class Workspace extends \Google\Model
    * @var string
    */
   public $name;
+  protected $privateResourceMetadataType = PrivateResourceMetadata::class;
+  protected $privateResourceMetadataDataType = '';
 
   /**
    * Output only. The timestamp of when the workspace was created.
@@ -76,6 +85,23 @@ class Workspace extends \Google\Model
     return $this->dataEncryptionState;
   }
   /**
+   * Optional. If set to true, workspaces will not be moved if its linked
+   * Repository is moved. Instead, it will be deleted.
+   *
+   * @param bool $disableMoves
+   */
+  public function setDisableMoves($disableMoves)
+  {
+    $this->disableMoves = $disableMoves;
+  }
+  /**
+   * @return bool
+   */
+  public function getDisableMoves()
+  {
+    return $this->disableMoves;
+  }
+  /**
    * Output only. All the metadata information that is used internally to serve
    * the resource. For example: timestamps, flags, status fields, etc. The
    * format of this field is a JSON string.
@@ -108,6 +134,23 @@ class Workspace extends \Google\Model
   public function getName()
   {
     return $this->name;
+  }
+  /**
+   * Output only. Metadata indicating whether this resource is user-scoped. For
+   * `Workspace` resources, the `user_scoped` field is always `true`.
+   *
+   * @param PrivateResourceMetadata $privateResourceMetadata
+   */
+  public function setPrivateResourceMetadata(PrivateResourceMetadata $privateResourceMetadata)
+  {
+    $this->privateResourceMetadata = $privateResourceMetadata;
+  }
+  /**
+   * @return PrivateResourceMetadata
+   */
+  public function getPrivateResourceMetadata()
+  {
+    return $this->privateResourceMetadata;
   }
 }
 

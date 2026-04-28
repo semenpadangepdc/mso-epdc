@@ -19,6 +19,8 @@ namespace Google\Service\Docs;
 
 class Request extends \Google\Model
 {
+  protected $addDocumentTabType = AddDocumentTabRequest::class;
+  protected $addDocumentTabDataType = '';
   protected $createFooterType = CreateFooterRequest::class;
   protected $createFooterDataType = '';
   protected $createFootnoteType = CreateFootnoteRequest::class;
@@ -41,16 +43,22 @@ class Request extends \Google\Model
   protected $deleteParagraphBulletsDataType = '';
   protected $deletePositionedObjectType = DeletePositionedObjectRequest::class;
   protected $deletePositionedObjectDataType = '';
+  protected $deleteTabType = DeleteTabRequest::class;
+  protected $deleteTabDataType = '';
   protected $deleteTableColumnType = DeleteTableColumnRequest::class;
   protected $deleteTableColumnDataType = '';
   protected $deleteTableRowType = DeleteTableRowRequest::class;
   protected $deleteTableRowDataType = '';
+  protected $insertDateType = InsertDateRequest::class;
+  protected $insertDateDataType = '';
   protected $insertInlineImageType = InsertInlineImageRequest::class;
   protected $insertInlineImageDataType = '';
   protected $insertPageBreakType = InsertPageBreakRequest::class;
   protected $insertPageBreakDataType = '';
   protected $insertPersonType = InsertPersonRequest::class;
   protected $insertPersonDataType = '';
+  protected $insertRichLinkType = InsertRichLinkRequest::class;
+  protected $insertRichLinkDataType = '';
   protected $insertSectionBreakType = InsertSectionBreakRequest::class;
   protected $insertSectionBreakDataType = '';
   protected $insertTableType = InsertTableRequest::class;
@@ -75,6 +83,10 @@ class Request extends \Google\Model
   protected $unmergeTableCellsDataType = '';
   protected $updateDocumentStyleType = UpdateDocumentStyleRequest::class;
   protected $updateDocumentStyleDataType = '';
+  protected $updateDocumentTabPropertiesType = UpdateDocumentTabPropertiesRequest::class;
+  protected $updateDocumentTabPropertiesDataType = '';
+  protected $updateNamedStyleType = UpdateNamedStyleRequest::class;
+  protected $updateNamedStyleDataType = '';
   protected $updateParagraphStyleType = UpdateParagraphStyleRequest::class;
   protected $updateParagraphStyleDataType = '';
   protected $updateSectionStyleType = UpdateSectionStyleRequest::class;
@@ -88,6 +100,22 @@ class Request extends \Google\Model
   protected $updateTextStyleType = UpdateTextStyleRequest::class;
   protected $updateTextStyleDataType = '';
 
+  /**
+   * Adds a document tab.
+   *
+   * @param AddDocumentTabRequest $addDocumentTab
+   */
+  public function setAddDocumentTab(AddDocumentTabRequest $addDocumentTab)
+  {
+    $this->addDocumentTab = $addDocumentTab;
+  }
+  /**
+   * @return AddDocumentTabRequest
+   */
+  public function getAddDocumentTab()
+  {
+    return $this->addDocumentTab;
+  }
   /**
    * Creates a footer.
    *
@@ -265,6 +293,22 @@ class Request extends \Google\Model
     return $this->deletePositionedObject;
   }
   /**
+   * Deletes a document tab.
+   *
+   * @param DeleteTabRequest $deleteTab
+   */
+  public function setDeleteTab(DeleteTabRequest $deleteTab)
+  {
+    $this->deleteTab = $deleteTab;
+  }
+  /**
+   * @return DeleteTabRequest
+   */
+  public function getDeleteTab()
+  {
+    return $this->deleteTab;
+  }
+  /**
    * Deletes a column from a table.
    *
    * @param DeleteTableColumnRequest $deleteTableColumn
@@ -295,6 +339,22 @@ class Request extends \Google\Model
   public function getDeleteTableRow()
   {
     return $this->deleteTableRow;
+  }
+  /**
+   * Inserts a date.
+   *
+   * @param InsertDateRequest $insertDate
+   */
+  public function setInsertDate(InsertDateRequest $insertDate)
+  {
+    $this->insertDate = $insertDate;
+  }
+  /**
+   * @return InsertDateRequest
+   */
+  public function getInsertDate()
+  {
+    return $this->insertDate;
   }
   /**
    * Inserts an inline image at the specified location.
@@ -343,6 +403,22 @@ class Request extends \Google\Model
   public function getInsertPerson()
   {
     return $this->insertPerson;
+  }
+  /**
+   * Insert a rich link.
+   *
+   * @param InsertRichLinkRequest $insertRichLink
+   */
+  public function setInsertRichLink(InsertRichLinkRequest $insertRichLink)
+  {
+    $this->insertRichLink = $insertRichLink;
+  }
+  /**
+   * @return InsertRichLinkRequest
+   */
+  public function getInsertRichLink()
+  {
+    return $this->insertRichLink;
   }
   /**
    * Inserts a section break at the specified location.
@@ -535,6 +611,38 @@ class Request extends \Google\Model
   public function getUpdateDocumentStyle()
   {
     return $this->updateDocumentStyle;
+  }
+  /**
+   * Updates the properties of a document tab.
+   *
+   * @param UpdateDocumentTabPropertiesRequest $updateDocumentTabProperties
+   */
+  public function setUpdateDocumentTabProperties(UpdateDocumentTabPropertiesRequest $updateDocumentTabProperties)
+  {
+    $this->updateDocumentTabProperties = $updateDocumentTabProperties;
+  }
+  /**
+   * @return UpdateDocumentTabPropertiesRequest
+   */
+  public function getUpdateDocumentTabProperties()
+  {
+    return $this->updateDocumentTabProperties;
+  }
+  /**
+   * Updates a named style.
+   *
+   * @param UpdateNamedStyleRequest $updateNamedStyle
+   */
+  public function setUpdateNamedStyle(UpdateNamedStyleRequest $updateNamedStyle)
+  {
+    $this->updateNamedStyle = $updateNamedStyle;
+  }
+  /**
+   * @return UpdateNamedStyleRequest
+   */
+  public function getUpdateNamedStyle()
+  {
+    return $this->updateNamedStyle;
   }
   /**
    * Updates the paragraph style at the specified range.

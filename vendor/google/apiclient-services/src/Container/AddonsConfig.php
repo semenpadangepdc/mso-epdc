@@ -47,8 +47,14 @@ class AddonsConfig extends \Google\Model
   protected $networkPolicyConfigDataType = '';
   protected $parallelstoreCsiDriverConfigType = ParallelstoreCsiDriverConfig::class;
   protected $parallelstoreCsiDriverConfigDataType = '';
+  protected $podSnapshotConfigType = PodSnapshotConfig::class;
+  protected $podSnapshotConfigDataType = '';
   protected $rayOperatorConfigType = RayOperatorConfig::class;
   protected $rayOperatorConfigDataType = '';
+  protected $sliceControllerConfigType = SliceControllerConfig::class;
+  protected $sliceControllerConfigDataType = '';
+  protected $slurmOperatorConfigType = SlurmOperatorConfig::class;
+  protected $slurmOperatorConfigDataType = '';
   protected $statefulHaConfigType = StatefulHAConfig::class;
   protected $statefulHaConfigDataType = '';
 
@@ -290,6 +296,22 @@ class AddonsConfig extends \Google\Model
     return $this->parallelstoreCsiDriverConfig;
   }
   /**
+   * Optional. Configuration for the Pod Snapshot feature.
+   *
+   * @param PodSnapshotConfig $podSnapshotConfig
+   */
+  public function setPodSnapshotConfig(PodSnapshotConfig $podSnapshotConfig)
+  {
+    $this->podSnapshotConfig = $podSnapshotConfig;
+  }
+  /**
+   * @return PodSnapshotConfig
+   */
+  public function getPodSnapshotConfig()
+  {
+    return $this->podSnapshotConfig;
+  }
+  /**
    * Optional. Configuration for Ray Operator addon.
    *
    * @param RayOperatorConfig $rayOperatorConfig
@@ -304,6 +326,38 @@ class AddonsConfig extends \Google\Model
   public function getRayOperatorConfig()
   {
     return $this->rayOperatorConfig;
+  }
+  /**
+   * Optional. Configuration for the slice controller add-on.
+   *
+   * @param SliceControllerConfig $sliceControllerConfig
+   */
+  public function setSliceControllerConfig(SliceControllerConfig $sliceControllerConfig)
+  {
+    $this->sliceControllerConfig = $sliceControllerConfig;
+  }
+  /**
+   * @return SliceControllerConfig
+   */
+  public function getSliceControllerConfig()
+  {
+    return $this->sliceControllerConfig;
+  }
+  /**
+   * Configuration for the Slurm Operator.
+   *
+   * @param SlurmOperatorConfig $slurmOperatorConfig
+   */
+  public function setSlurmOperatorConfig(SlurmOperatorConfig $slurmOperatorConfig)
+  {
+    $this->slurmOperatorConfig = $slurmOperatorConfig;
+  }
+  /**
+   * @return SlurmOperatorConfig
+   */
+  public function getSlurmOperatorConfig()
+  {
+    return $this->slurmOperatorConfig;
   }
   /**
    * Optional. Configuration for the StatefulHA add-on.

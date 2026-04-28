@@ -45,14 +45,15 @@ class AuthzExtension extends \Google\Collection
   public const WIRE_FORMAT_EXT_PROC_GRPC = 'EXT_PROC_GRPC';
   /**
    * The extension service uses Envoy's `ext_authz` gRPC API. The backend
-   * service for the extension must use HTTP2, or H2C as the protocol.
+   * service for the extension must use HTTP2 or H2C as the protocol.
    * `EXT_AUTHZ_GRPC` is only supported for regional `AuthzExtension` resources.
    */
   public const WIRE_FORMAT_EXT_AUTHZ_GRPC = 'EXT_AUTHZ_GRPC';
   protected $collection_key = 'forwardHeaders';
   /**
-   * Required. The `:authority` header in the gRPC request sent from Envoy to
-   * the extension service.
+   * Optional. The `:authority` header in the gRPC request sent from Envoy to
+   * the extension service. It is required when the `service` field points to a
+   * backend service or a wasm plugin.
    *
    * @var string
    */
@@ -84,6 +85,19 @@ class AuthzExtension extends \Google\Collection
    */
   public $failOpen;
   /**
+   * Optional. List of the Envoy attributes to forward to the extension server.
+   * The attributes provided here are included as part of the
+   * `ProcessingRequest.attributes` field (of type `map`), where the keys are
+   * the attribute names. Refer to the
+   * [documentation](https://cloud.google.com/service-extensions/docs/cel-
+   * matcher-language-reference#attributes) for the names of attributes that can
+   * be forwarded. If omitted, no attributes are sent. Each element is a string
+   * indicating the attribute name.
+   *
+   * @var string[]
+   */
+  public $forwardAttributes;
+  /**
    * Optional. List of the HTTP headers to forward to the extension (from the
    * client). If omitted, all headers are sent. Each element is a string
    * indicating the header name.
@@ -101,9 +115,10 @@ class AuthzExtension extends \Google\Collection
    */
   public $labels;
   /**
-   * Required. All backend services and forwarding rules referenced by this
+   * Optional. All backend services and forwarding rules referenced by this
    * extension must share the same load balancing scheme. Supported values:
-   * `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to
+   * `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. Can be omitted for AuthzExtensions
+   * that do not reference a backend service. For more information, refer to
    * [Backend services overview](https://cloud.google.com/load-
    * balancing/docs/backend-service).
    *
@@ -156,15 +171,18 @@ class AuthzExtension extends \Google\Collection
   public $updateTime;
   /**
    * Optional. The format of communication supported by the callout extension.
-   * If not specified, the default value `EXT_PROC_GRPC` is used.
+   * This field is supported only for regional `AuthzExtension` resources. If
+   * not specified, the default value `EXT_PROC_GRPC` is used. Global
+   * `AuthzExtension` resources use the `EXT_PROC_GRPC` wire format.
    *
    * @var string
    */
   public $wireFormat;
 
   /**
-   * Required. The `:authority` header in the gRPC request sent from Envoy to
-   * the extension service.
+   * Optional. The `:authority` header in the gRPC request sent from Envoy to
+   * the extension service. It is required when the `service` field points to a
+   * backend service or a wasm plugin.
    *
    * @param string $authority
    */
@@ -236,6 +254,29 @@ class AuthzExtension extends \Google\Collection
     return $this->failOpen;
   }
   /**
+   * Optional. List of the Envoy attributes to forward to the extension server.
+   * The attributes provided here are included as part of the
+   * `ProcessingRequest.attributes` field (of type `map`), where the keys are
+   * the attribute names. Refer to the
+   * [documentation](https://cloud.google.com/service-extensions/docs/cel-
+   * matcher-language-reference#attributes) for the names of attributes that can
+   * be forwarded. If omitted, no attributes are sent. Each element is a string
+   * indicating the attribute name.
+   *
+   * @param string[] $forwardAttributes
+   */
+  public function setForwardAttributes($forwardAttributes)
+  {
+    $this->forwardAttributes = $forwardAttributes;
+  }
+  /**
+   * @return string[]
+   */
+  public function getForwardAttributes()
+  {
+    return $this->forwardAttributes;
+  }
+  /**
    * Optional. List of the HTTP headers to forward to the extension (from the
    * client). If omitted, all headers are sent. Each element is a string
    * indicating the header name.
@@ -273,9 +314,10 @@ class AuthzExtension extends \Google\Collection
     return $this->labels;
   }
   /**
-   * Required. All backend services and forwarding rules referenced by this
+   * Optional. All backend services and forwarding rules referenced by this
    * extension must share the same load balancing scheme. Supported values:
-   * `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. For more information, refer to
+   * `INTERNAL_MANAGED`, `EXTERNAL_MANAGED`. Can be omitted for AuthzExtensions
+   * that do not reference a backend service. For more information, refer to
    * [Backend services overview](https://cloud.google.com/load-
    * balancing/docs/backend-service).
    *
@@ -391,7 +433,9 @@ class AuthzExtension extends \Google\Collection
   }
   /**
    * Optional. The format of communication supported by the callout extension.
-   * If not specified, the default value `EXT_PROC_GRPC` is used.
+   * This field is supported only for regional `AuthzExtension` resources. If
+   * not specified, the default value `EXT_PROC_GRPC` is used. Global
+   * `AuthzExtension` resources use the `EXT_PROC_GRPC` wire format.
    *
    * Accepted values: WIRE_FORMAT_UNSPECIFIED, EXT_PROC_GRPC, EXT_AUTHZ_GRPC
    *

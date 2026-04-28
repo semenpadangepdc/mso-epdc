@@ -19,6 +19,22 @@ namespace Google\Service\Aiplatform;
 
 class GoogleCloudAiplatformV1ReasoningEngineSpec extends \Google\Collection
 {
+  /**
+   * Default value. Use a custom service account if the `service_account` field
+   * is set, otherwise use the default Vertex AI Reasoning Engine Service Agent
+   * in the project. Same behavior as SERVICE_ACCOUNT.
+   */
+  public const IDENTITY_TYPE_IDENTITY_TYPE_UNSPECIFIED = 'IDENTITY_TYPE_UNSPECIFIED';
+  /**
+   * Use a custom service account if the `service_account` field is set,
+   * otherwise use the default Vertex AI Reasoning Engine Service Agent in the
+   * project.
+   */
+  public const IDENTITY_TYPE_SERVICE_ACCOUNT = 'SERVICE_ACCOUNT';
+  /**
+   * Use Agent Identity. The `service_account` field must not be set.
+   */
+  public const IDENTITY_TYPE_AGENT_IDENTITY = 'AGENT_IDENTITY';
   protected $collection_key = 'classMethods';
   /**
    * Optional. The OSS agent framework used to develop the agent. Currently
@@ -35,8 +51,31 @@ class GoogleCloudAiplatformV1ReasoningEngineSpec extends \Google\Collection
    * @var array[]
    */
   public $classMethods;
+  protected $containerSpecType = GoogleCloudAiplatformV1ReasoningEngineSpecContainerSpec::class;
+  protected $containerSpecDataType = '';
   protected $deploymentSpecType = GoogleCloudAiplatformV1ReasoningEngineSpecDeploymentSpec::class;
   protected $deploymentSpecDataType = '';
+  /**
+   * Output only. The identity to use for the Reasoning Engine. It can contain
+   * one of the following values: * service-{project}@gcp-sa-aiplatform-
+   * re.googleapis.com (for SERVICE_AGENT identity type) *
+   * {name}@{project}.gserviceaccount.com (for SERVICE_ACCOUNT identity type) *
+   * agents.global.{org}.system.id.goog/resources/aiplatform/projects/{project}/
+   * locations/{location}/reasoningEngines/{reasoning_engine} (for
+   * AGENT_IDENTITY identity type)
+   *
+   * @var string
+   */
+  public $effectiveIdentity;
+  /**
+   * Optional. The identity type to use for the Reasoning Engine. If not
+   * specified, the `service_account` field will be used if set, otherwise the
+   * default Vertex AI Reasoning Engine Service Agent in the project will be
+   * used.
+   *
+   * @var string
+   */
+  public $identityType;
   protected $packageSpecType = GoogleCloudAiplatformV1ReasoningEngineSpecPackageSpec::class;
   protected $packageSpecDataType = '';
   /**
@@ -88,6 +127,22 @@ class GoogleCloudAiplatformV1ReasoningEngineSpec extends \Google\Collection
     return $this->classMethods;
   }
   /**
+   * Deploy from a container image with a defined entrypoint and commands.
+   *
+   * @param GoogleCloudAiplatformV1ReasoningEngineSpecContainerSpec $containerSpec
+   */
+  public function setContainerSpec(GoogleCloudAiplatformV1ReasoningEngineSpecContainerSpec $containerSpec)
+  {
+    $this->containerSpec = $containerSpec;
+  }
+  /**
+   * @return GoogleCloudAiplatformV1ReasoningEngineSpecContainerSpec
+   */
+  public function getContainerSpec()
+  {
+    return $this->containerSpec;
+  }
+  /**
    * Optional. The specification of a Reasoning Engine deployment.
    *
    * @param GoogleCloudAiplatformV1ReasoningEngineSpecDeploymentSpec $deploymentSpec
@@ -102,6 +157,49 @@ class GoogleCloudAiplatformV1ReasoningEngineSpec extends \Google\Collection
   public function getDeploymentSpec()
   {
     return $this->deploymentSpec;
+  }
+  /**
+   * Output only. The identity to use for the Reasoning Engine. It can contain
+   * one of the following values: * service-{project}@gcp-sa-aiplatform-
+   * re.googleapis.com (for SERVICE_AGENT identity type) *
+   * {name}@{project}.gserviceaccount.com (for SERVICE_ACCOUNT identity type) *
+   * agents.global.{org}.system.id.goog/resources/aiplatform/projects/{project}/
+   * locations/{location}/reasoningEngines/{reasoning_engine} (for
+   * AGENT_IDENTITY identity type)
+   *
+   * @param string $effectiveIdentity
+   */
+  public function setEffectiveIdentity($effectiveIdentity)
+  {
+    $this->effectiveIdentity = $effectiveIdentity;
+  }
+  /**
+   * @return string
+   */
+  public function getEffectiveIdentity()
+  {
+    return $this->effectiveIdentity;
+  }
+  /**
+   * Optional. The identity type to use for the Reasoning Engine. If not
+   * specified, the `service_account` field will be used if set, otherwise the
+   * default Vertex AI Reasoning Engine Service Agent in the project will be
+   * used.
+   *
+   * Accepted values: IDENTITY_TYPE_UNSPECIFIED, SERVICE_ACCOUNT, AGENT_IDENTITY
+   *
+   * @param self::IDENTITY_TYPE_* $identityType
+   */
+  public function setIdentityType($identityType)
+  {
+    $this->identityType = $identityType;
+  }
+  /**
+   * @return self::IDENTITY_TYPE_*
+   */
+  public function getIdentityType()
+  {
+    return $this->identityType;
   }
   /**
    * Optional. User provided package spec of the ReasoningEngine. Ignored when

@@ -42,7 +42,7 @@ class GoogleCloudOrgpolicyV2CustomConstraint extends \Google\Collection
   /**
    * A Common Expression Language (CEL) condition which is used in the
    * evaluation of the constraint. For example:
-   * `resource.instanceName.matches("[production|test]_.*_(\d)+")` or,
+   * `resource.instanceName.matches("(production|test)_(.+_)?[\d]+")` or,
    * `resource.management.auto_upgrade == true` The max length of the condition
    * is 1000 characters.
    *
@@ -74,8 +74,9 @@ class GoogleCloudOrgpolicyV2CustomConstraint extends \Google\Collection
    * Format of the name should be *
    * `organizations/{organization_id}/customConstraints/{custom_constraint_id}`
    * Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms`
-   * The max length is 70 characters and the minimum length is 1. Note that the
-   * prefix `organizations/{organization_id}/customConstraints/` is not counted.
+   * The max length is 71 characters and the minimum length is 1. Note that the
+   * prefix `organizations/{organization_id}/customConstraints/custom.` is not
+   * counted.
    *
    * @var string
    */
@@ -117,7 +118,7 @@ class GoogleCloudOrgpolicyV2CustomConstraint extends \Google\Collection
   /**
    * A Common Expression Language (CEL) condition which is used in the
    * evaluation of the constraint. For example:
-   * `resource.instanceName.matches("[production|test]_.*_(\d)+")` or,
+   * `resource.instanceName.matches("(production|test)_(.+_)?[\d]+")` or,
    * `resource.management.auto_upgrade == true` The max length of the condition
    * is 1000 characters.
    *
@@ -189,8 +190,9 @@ class GoogleCloudOrgpolicyV2CustomConstraint extends \Google\Collection
    * Format of the name should be *
    * `organizations/{organization_id}/customConstraints/{custom_constraint_id}`
    * Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms`
-   * The max length is 70 characters and the minimum length is 1. Note that the
-   * prefix `organizations/{organization_id}/customConstraints/` is not counted.
+   * The max length is 71 characters and the minimum length is 1. Note that the
+   * prefix `organizations/{organization_id}/customConstraints/custom.` is not
+   * counted.
    *
    * @param string $name
    */

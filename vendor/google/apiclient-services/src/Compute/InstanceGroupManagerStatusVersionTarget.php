@@ -20,7 +20,7 @@ namespace Google\Service\Compute;
 class InstanceGroupManagerStatusVersionTarget extends \Google\Model
 {
   /**
-   * [Output Only] A bit indicating whether version target has been reached in
+   * Output only. A bit indicating whether version target has been reached in
    * this managed instance group, i.e. all instances are in their target
    * version. Instances' target version are specified byversion field on
    * Instance Group Manager.
@@ -30,7 +30,7 @@ class InstanceGroupManagerStatusVersionTarget extends \Google\Model
   public $isReached;
 
   /**
-   * [Output Only] A bit indicating whether version target has been reached in
+   * Output only. A bit indicating whether version target has been reached in
    * this managed instance group, i.e. all instances are in their target
    * version. Instances' target version are specified byversion field on
    * Instance Group Manager.

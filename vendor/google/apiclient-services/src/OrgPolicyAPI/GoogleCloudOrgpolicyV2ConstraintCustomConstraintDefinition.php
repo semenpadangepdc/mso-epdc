@@ -41,7 +41,7 @@ class GoogleCloudOrgpolicyV2ConstraintCustomConstraintDefinition extends \Google
   public $actionType;
   /**
    * Org policy condition/expression. For example:
-   * `resource.instanceName.matches("[production|test]_.*_(\d)+")` or,
+   * `resource.instanceName.matches("(production|test)_(.+_)?[\d]+")` or,
    * `resource.management.auto_upgrade == true` The max length of the condition
    * is 1000 characters.
    *
@@ -57,8 +57,8 @@ class GoogleCloudOrgpolicyV2ConstraintCustomConstraintDefinition extends \Google
   protected $parametersType = GoogleCloudOrgpolicyV2ConstraintCustomConstraintDefinitionParameter::class;
   protected $parametersDataType = 'map';
   /**
-   * The resource instance type on which this policy applies. Format will be of
-   * the form : `/` Example: * `compute.googleapis.com/Instance`.
+   * The resource instance type that this policy applies to, in the format `/`.
+   * Example: * `compute.googleapis.com/Instance`.
    *
    * @var string[]
    */
@@ -84,7 +84,7 @@ class GoogleCloudOrgpolicyV2ConstraintCustomConstraintDefinition extends \Google
   }
   /**
    * Org policy condition/expression. For example:
-   * `resource.instanceName.matches("[production|test]_.*_(\d)+")` or,
+   * `resource.instanceName.matches("(production|test)_(.+_)?[\d]+")` or,
    * `resource.management.auto_upgrade == true` The max length of the condition
    * is 1000 characters.
    *
@@ -135,8 +135,8 @@ class GoogleCloudOrgpolicyV2ConstraintCustomConstraintDefinition extends \Google
     return $this->parameters;
   }
   /**
-   * The resource instance type on which this policy applies. Format will be of
-   * the form : `/` Example: * `compute.googleapis.com/Instance`.
+   * The resource instance type that this policy applies to, in the format `/`.
+   * Example: * `compute.googleapis.com/Instance`.
    *
    * @param string[] $resourceTypes
    */

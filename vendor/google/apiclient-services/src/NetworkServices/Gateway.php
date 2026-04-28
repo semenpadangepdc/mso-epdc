@@ -29,8 +29,8 @@ class Gateway extends \Google\Collection
   public const ENVOY_HEADERS_NONE = 'NONE';
   /**
    * Envoy will insert default internal debug headers into upstream requests:
-   * x-envoy-attempt-count x-envoy-is-timeout-retry x-envoy-expected-rq-timeout-
-   * ms x-envoy-original-path x-envoy-upstream-stream-duration-ms
+   * x-envoy-attempt-count, x-envoy-is-timeout-retry, x-envoy-expected-rq-
+   * timeout-ms, x-envoy-original-path, x-envoy-upstream-stream-duration-ms
    */
   public const ENVOY_HEADERS_DEBUG_HEADERS = 'DEBUG_HEADERS';
   /**
@@ -80,6 +80,22 @@ class Gateway extends \Google\Collection
    * @var string[]
    */
   public $addresses;
+  /**
+   * Optional. If true, the Gateway will listen on all ports. This is mutually
+   * exclusive with the `ports` field. This field only applies to gateways of
+   * type 'SECURE_WEB_GATEWAY'.
+   *
+   * @var bool
+   */
+  public $allPorts;
+  /**
+   * Optional. If true, the gateway will allow traffic from clients outside of
+   * the region where the gateway is located. This field is configurable only
+   * for gateways of type SECURE_WEB_GATEWAY.
+   *
+   * @var bool
+   */
+  public $allowGlobalAccess;
   /**
    * Optional. A fully-qualified Certificates URL reference. The proxy presents
    * a Certificate (selected based on SNI) when establishing a TLS connection.
@@ -230,6 +246,42 @@ class Gateway extends \Google\Collection
   public function getAddresses()
   {
     return $this->addresses;
+  }
+  /**
+   * Optional. If true, the Gateway will listen on all ports. This is mutually
+   * exclusive with the `ports` field. This field only applies to gateways of
+   * type 'SECURE_WEB_GATEWAY'.
+   *
+   * @param bool $allPorts
+   */
+  public function setAllPorts($allPorts)
+  {
+    $this->allPorts = $allPorts;
+  }
+  /**
+   * @return bool
+   */
+  public function getAllPorts()
+  {
+    return $this->allPorts;
+  }
+  /**
+   * Optional. If true, the gateway will allow traffic from clients outside of
+   * the region where the gateway is located. This field is configurable only
+   * for gateways of type SECURE_WEB_GATEWAY.
+   *
+   * @param bool $allowGlobalAccess
+   */
+  public function setAllowGlobalAccess($allowGlobalAccess)
+  {
+    $this->allowGlobalAccess = $allowGlobalAccess;
+  }
+  /**
+   * @return bool
+   */
+  public function getAllowGlobalAccess()
+  {
+    return $this->allowGlobalAccess;
   }
   /**
    * Optional. A fully-qualified Certificates URL reference. The proxy presents

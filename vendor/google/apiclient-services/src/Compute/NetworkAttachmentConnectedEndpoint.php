@@ -70,6 +70,12 @@ class NetworkAttachmentConnectedEndpoint extends \Google\Collection
    */
   public $secondaryIpCidrRanges;
   /**
+   * The service class id of the producer service to which the IP was assigned.
+   *
+   * @var string
+   */
+  public $serviceClassId;
+  /**
    * The status of a connected endpoint to this network attachment.
    *
    * @var string
@@ -83,8 +89,8 @@ class NetworkAttachmentConnectedEndpoint extends \Google\Collection
    */
   public $subnetwork;
   /**
-   * [Output Only] The CIDR range of the subnet from which the IPv4 internal IP
-   * was allocated from.
+   * Output only. [Output Only] The CIDR range of the subnet from which the IPv4
+   * internal IP was allocated from.
    *
    * @var string
    */
@@ -158,6 +164,22 @@ class NetworkAttachmentConnectedEndpoint extends \Google\Collection
     return $this->secondaryIpCidrRanges;
   }
   /**
+   * The service class id of the producer service to which the IP was assigned.
+   *
+   * @param string $serviceClassId
+   */
+  public function setServiceClassId($serviceClassId)
+  {
+    $this->serviceClassId = $serviceClassId;
+  }
+  /**
+   * @return string
+   */
+  public function getServiceClassId()
+  {
+    return $this->serviceClassId;
+  }
+  /**
    * The status of a connected endpoint to this network attachment.
    *
    * Accepted values: ACCEPTED, CLOSED, NEEDS_ATTENTION, PENDING, REJECTED,
@@ -194,8 +216,8 @@ class NetworkAttachmentConnectedEndpoint extends \Google\Collection
     return $this->subnetwork;
   }
   /**
-   * [Output Only] The CIDR range of the subnet from which the IPv4 internal IP
-   * was allocated from.
+   * Output only. [Output Only] The CIDR range of the subnet from which the IPv4
+   * internal IP was allocated from.
    *
    * @param string $subnetworkCidrRange
    */

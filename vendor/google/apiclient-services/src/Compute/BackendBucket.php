@@ -30,6 +30,11 @@ class BackendBucket extends \Google\Collection
    */
   public const COMPRESSION_MODE_DISABLED = 'DISABLED';
   /**
+   * Signifies that this will be used for regional external Application Load
+   * Balancers.
+   */
+  public const LOAD_BALANCING_SCHEME_EXTERNAL_MANAGED = 'EXTERNAL_MANAGED';
+  /**
    * Signifies that this will be used for internal Application Load Balancers.
    */
   public const LOAD_BALANCING_SCHEME_INTERNAL_MANAGED = 'INTERNAL_MANAGED';
@@ -88,7 +93,7 @@ class BackendBucket extends \Google\Collection
    */
   public $id;
   /**
-   * Type of the resource.
+   * Output only. Type of the resource.
    *
    * @var string
    */
@@ -118,6 +123,15 @@ class BackendBucket extends \Google\Collection
   public $name;
   protected $paramsType = BackendBucketParams::class;
   protected $paramsDataType = '';
+  /**
+   * Output only. [Output Only] URL of the region where the regional backend
+   * bucket resides. This field is not applicable to global backend buckets. You
+   * must specify this field as part of the HTTP request URL. It is not settable
+   * as a field in the request body.
+   *
+   * @var string
+   */
+  public $region;
   /**
    * [Output Only] Server-defined URL for the resource.
    *
@@ -277,7 +291,7 @@ class BackendBucket extends \Google\Collection
     return $this->id;
   }
   /**
-   * Type of the resource.
+   * Output only. Type of the resource.
    *
    * @param string $kind
    */
@@ -300,7 +314,7 @@ class BackendBucket extends \Google\Collection
    * classic global external load balancers, or global application external load
    * balancers, or both.
    *
-   * Accepted values: INTERNAL_MANAGED
+   * Accepted values: EXTERNAL_MANAGED, INTERNAL_MANAGED
    *
    * @param self::LOAD_BALANCING_SCHEME_* $loadBalancingScheme
    */
@@ -355,6 +369,25 @@ class BackendBucket extends \Google\Collection
     return $this->params;
   }
   /**
+   * Output only. [Output Only] URL of the region where the regional backend
+   * bucket resides. This field is not applicable to global backend buckets. You
+   * must specify this field as part of the HTTP request URL. It is not settable
+   * as a field in the request body.
+   *
+   * @param string $region
+   */
+  public function setRegion($region)
+  {
+    $this->region = $region;
+  }
+  /**
+   * @return string
+   */
+  public function getRegion()
+  {
+    return $this->region;
+  }
+  /**
    * [Output Only] Server-defined URL for the resource.
    *
    * @param string $selfLink
@@ -371,7 +404,8 @@ class BackendBucket extends \Google\Collection
     return $this->selfLink;
   }
   /**
-   * [Output Only] List of resources referencing that backend bucket.
+   * Output only. [Output Only] List of resources referencing that backend
+   * bucket.
    *
    * @param BackendBucketUsedBy[] $usedBy
    */

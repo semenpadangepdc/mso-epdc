@@ -85,6 +85,8 @@ class LinuxNodeConfig extends \Google\Model
    * Transparent hugepage support for anonymous memory is disabled.
    */
   public const TRANSPARENT_HUGEPAGE_ENABLED_TRANSPARENT_HUGEPAGE_ENABLED_NEVER = 'TRANSPARENT_HUGEPAGE_ENABLED_NEVER';
+  protected $accurateTimeConfigType = AccurateTimeConfig::class;
+  protected $accurateTimeConfigDataType = '';
   /**
    * cgroup_mode specifies the cgroup mode to be used on the node.
    *
@@ -95,6 +97,8 @@ class LinuxNodeConfig extends \Google\Model
   protected $hugepagesDataType = '';
   protected $nodeKernelModuleLoadingType = NodeKernelModuleLoading::class;
   protected $nodeKernelModuleLoadingDataType = '';
+  protected $swapConfigType = SwapConfig::class;
+  protected $swapConfigDataType = '';
   /**
    * The Linux kernel parameters to be applied to the nodes and all pods running
    * on the nodes. The following parameters are supported. net.core.busy_poll
@@ -143,6 +147,22 @@ class LinuxNodeConfig extends \Google\Model
    */
   public $transparentHugepageEnabled;
 
+  /**
+   * Optional. The accurate time configuration for the node pool.
+   *
+   * @param AccurateTimeConfig $accurateTimeConfig
+   */
+  public function setAccurateTimeConfig(AccurateTimeConfig $accurateTimeConfig)
+  {
+    $this->accurateTimeConfig = $accurateTimeConfig;
+  }
+  /**
+   * @return AccurateTimeConfig
+   */
+  public function getAccurateTimeConfig()
+  {
+    return $this->accurateTimeConfig;
+  }
   /**
    * cgroup_mode specifies the cgroup mode to be used on the node.
    *
@@ -194,6 +214,23 @@ class LinuxNodeConfig extends \Google\Model
   public function getNodeKernelModuleLoading()
   {
     return $this->nodeKernelModuleLoading;
+  }
+  /**
+   * Optional. Enables and configures swap space on nodes. If omitted, swap is
+   * disabled.
+   *
+   * @param SwapConfig $swapConfig
+   */
+  public function setSwapConfig(SwapConfig $swapConfig)
+  {
+    $this->swapConfig = $swapConfig;
+  }
+  /**
+   * @return SwapConfig
+   */
+  public function getSwapConfig()
+  {
+    return $this->swapConfig;
   }
   /**
    * The Linux kernel parameters to be applied to the nodes and all pods running

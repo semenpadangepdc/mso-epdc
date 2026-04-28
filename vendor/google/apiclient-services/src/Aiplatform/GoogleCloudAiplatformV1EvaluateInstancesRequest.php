@@ -38,6 +38,15 @@ class GoogleCloudAiplatformV1EvaluateInstancesRequest extends \Google\Collection
   protected $groundednessInputDataType = '';
   protected $instanceType = GoogleCloudAiplatformV1EvaluationInstance::class;
   protected $instanceDataType = '';
+  /**
+   * Required. The resource name of the Location to evaluate the instances.
+   * Format: `projects/{project}/locations/{location}`
+   *
+   * @var string
+   */
+  public $location;
+  protected $metricSourcesType = GoogleCloudAiplatformV1MetricSource::class;
+  protected $metricSourcesDataType = 'array';
   protected $metricsType = GoogleCloudAiplatformV1Metric::class;
   protected $metricsDataType = 'array';
   protected $metricxInputType = GoogleCloudAiplatformV1MetricxInput::class;
@@ -235,6 +244,41 @@ class GoogleCloudAiplatformV1EvaluateInstancesRequest extends \Google\Collection
   public function getInstance()
   {
     return $this->instance;
+  }
+  /**
+   * Required. The resource name of the Location to evaluate the instances.
+   * Format: `projects/{project}/locations/{location}`
+   *
+   * @param string $location
+   */
+  public function setLocation($location)
+  {
+    $this->location = $location;
+  }
+  /**
+   * @return string
+   */
+  public function getLocation()
+  {
+    return $this->location;
+  }
+  /**
+   * Optional. The metrics (either inline or registered) used for evaluation.
+   * Currently, we only support evaluating a single metric. If multiple metrics
+   * are provided, only the first one will be evaluated.
+   *
+   * @param GoogleCloudAiplatformV1MetricSource[] $metricSources
+   */
+  public function setMetricSources($metricSources)
+  {
+    $this->metricSources = $metricSources;
+  }
+  /**
+   * @return GoogleCloudAiplatformV1MetricSource[]
+   */
+  public function getMetricSources()
+  {
+    return $this->metricSources;
   }
   /**
    * The metrics used for evaluation. Currently, we only support evaluating a

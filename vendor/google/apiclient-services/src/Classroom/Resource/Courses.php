@@ -121,8 +121,7 @@ class Courses extends \Google\Service\Resource
    * @param array $optParams Optional parameters.
    *
    * @opt_param string courseStates Restricts returned courses to those in one of
-   * the specified states The default value is ACTIVE, ARCHIVED, PROVISIONED,
-   * DECLINED.
+   * the specified states. If unspecified, Courses in any state are returned.
    * @opt_param int pageSize Maximum number of items to return. Zero or
    * unspecified indicates that the server may assign a maximum. The server may
    * return fewer than the specified number of results.
@@ -133,11 +132,13 @@ class Courses extends \Google\Service\Resource
    * @opt_param string studentId Restricts returned courses to those having a
    * student with the specified identifier. The identifier can be one of the
    * following: * the numeric identifier for the user * the email address of the
-   * user * the string literal `"me"`, indicating the requesting user
+   * user * the string literal `"me"`, indicating the requesting user If
+   * specified, `teacher_id` must be empty.
    * @opt_param string teacherId Restricts returned courses to those having a
    * teacher with the specified identifier. The identifier can be one of the
    * following: * the numeric identifier for the user * the email address of the
-   * user * the string literal `"me"`, indicating the requesting user
+   * user * the string literal `"me"`, indicating the requesting user If
+   * specified, `student_id` must be empty.
    * @return ListCoursesResponse
    * @throws \Google\Service\Exception
    */
@@ -164,9 +165,9 @@ class Courses extends \Google\Service\Resource
    *
    * @opt_param string updateMask Mask that identifies which fields on the course
    * to update. This field is required to do an update. The update will fail if
-   * invalid fields are specified. The following fields are valid: * `name` *
-   * `section` * `descriptionHeading` * `description` * `room` * `courseState` *
-   * `ownerId` Note: patches to ownerId are treated as being effective
+   * invalid fields are specified. The following fields are valid: * `courseState`
+   * * `description` * `descriptionHeading` * `name` * `ownerId` * `room` *
+   * `section` * `subject` Note: patches to ownerId are treated as being effective
    * immediately, but in practice it may take some time for the ownership transfer
    * of all affected resources to complete. When set in a query parameter, this
    * field should be specified as `updateMask=,,...`

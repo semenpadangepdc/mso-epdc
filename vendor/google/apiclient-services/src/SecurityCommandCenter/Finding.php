@@ -67,6 +67,11 @@ class Finding extends \Google\Collection
    */
   public const FINDING_CLASS_CHOKEPOINT = 'CHOKEPOINT';
   /**
+   * Describes a potential security risk due to the resource being exposed to
+   * the internet.
+   */
+  public const FINDING_CLASS_EXTERNAL_EXPOSURE = 'EXTERNAL_EXPOSURE';
+  /**
    * Unspecified.
    */
   public const MUTE_MUTE_UNSPECIFIED = 'MUTE_UNSPECIFIED';
@@ -149,10 +154,14 @@ class Finding extends \Google\Collection
   protected $accessDataType = '';
   protected $affectedResourcesType = AffectedResources::class;
   protected $affectedResourcesDataType = '';
+  protected $agentDataAccessEventsType = AgentDataAccessEvent::class;
+  protected $agentDataAccessEventsDataType = 'array';
   protected $aiModelType = AiModel::class;
   protected $aiModelDataType = '';
   protected $applicationType = Application::class;
   protected $applicationDataType = '';
+  protected $artifactGuardPoliciesType = ArtifactGuardPolicies::class;
+  protected $artifactGuardPoliciesDataType = '';
   protected $attackExposureType = AttackExposure::class;
   protected $attackExposureDataType = '';
   protected $backupDisasterRecoveryType = BackupDisasterRecovery::class;
@@ -213,6 +222,8 @@ class Finding extends \Google\Collection
    * @var string
    */
   public $description;
+  protected $discoveredWorkloadType = DiscoveredWorkload::class;
+  protected $discoveredWorkloadDataType = '';
   protected $diskType = Disk::class;
   protected $diskDataType = '';
   /**
@@ -229,6 +240,8 @@ class Finding extends \Google\Collection
   public $eventTime;
   protected $exfiltrationType = Exfiltration::class;
   protected $exfiltrationDataType = '';
+  protected $externalExposureType = ExternalExposure::class;
+  protected $externalExposureDataType = '';
   protected $externalSystemsType = GoogleCloudSecuritycenterV1ExternalSystem::class;
   protected $externalSystemsDataType = 'map';
   /**
@@ -337,6 +350,8 @@ class Finding extends \Google\Collection
    * @var string
    */
   public $parentDisplayName;
+  protected $policyViolationSummaryType = PolicyViolationSummary::class;
+  protected $policyViolationSummaryDataType = '';
   protected $processesType = Process::class;
   protected $processesDataType = 'array';
   /**
@@ -350,6 +365,8 @@ class Finding extends \Google\Collection
    * @var string
    */
   public $resourceName;
+  protected $secretType = Secret::class;
+  protected $secretDataType = '';
   protected $securityMarksType = SecurityMarks::class;
   protected $securityMarksDataType = '';
   protected $securityPostureType = SecurityPosture::class;
@@ -417,6 +434,22 @@ class Finding extends \Google\Collection
     return $this->affectedResources;
   }
   /**
+   * Agent data access events associated with the finding.
+   *
+   * @param AgentDataAccessEvent[] $agentDataAccessEvents
+   */
+  public function setAgentDataAccessEvents($agentDataAccessEvents)
+  {
+    $this->agentDataAccessEvents = $agentDataAccessEvents;
+  }
+  /**
+   * @return AgentDataAccessEvent[]
+   */
+  public function getAgentDataAccessEvents()
+  {
+    return $this->agentDataAccessEvents;
+  }
+  /**
    * The AI model associated with the finding.
    *
    * @param AiModel $aiModel
@@ -447,6 +480,22 @@ class Finding extends \Google\Collection
   public function getApplication()
   {
     return $this->application;
+  }
+  /**
+   * ArtifactGuardPolicies associated with the finding.
+   *
+   * @param ArtifactGuardPolicies $artifactGuardPolicies
+   */
+  public function setArtifactGuardPolicies(ArtifactGuardPolicies $artifactGuardPolicies)
+  {
+    $this->artifactGuardPolicies = $artifactGuardPolicies;
+  }
+  /**
+   * @return ArtifactGuardPolicies
+   */
+  public function getArtifactGuardPolicies()
+  {
+    return $this->artifactGuardPolicies;
   }
   /**
    * The results of an attack path simulation relevant to this finding.
@@ -771,6 +820,22 @@ class Finding extends \Google\Collection
     return $this->description;
   }
   /**
+   * DiscoveredWorkload associated with the finding.
+   *
+   * @param DiscoveredWorkload $discoveredWorkload
+   */
+  public function setDiscoveredWorkload(DiscoveredWorkload $discoveredWorkload)
+  {
+    $this->discoveredWorkload = $discoveredWorkload;
+  }
+  /**
+   * @return DiscoveredWorkload
+   */
+  public function getDiscoveredWorkload()
+  {
+    return $this->discoveredWorkload;
+  }
+  /**
    * Disk associated with the finding.
    *
    * @param Disk $disk
@@ -823,6 +888,22 @@ class Finding extends \Google\Collection
   public function getExfiltration()
   {
     return $this->exfiltration;
+  }
+  /**
+   * External exposure associated with the finding.
+   *
+   * @param ExternalExposure $externalExposure
+   */
+  public function setExternalExposure(ExternalExposure $externalExposure)
+  {
+    $this->externalExposure = $externalExposure;
+  }
+  /**
+   * @return ExternalExposure
+   */
+  public function getExternalExposure()
+  {
+    return $this->externalExposure;
   }
   /**
    * Output only. Third party SIEM/SOAR fields within SCC, contains external
@@ -880,7 +961,7 @@ class Finding extends \Google\Collection
    *
    * Accepted values: FINDING_CLASS_UNSPECIFIED, THREAT, VULNERABILITY,
    * MISCONFIGURATION, OBSERVATION, SCC_ERROR, POSTURE_VIOLATION,
-   * TOXIC_COMBINATION, SENSITIVE_DATA_RISK, CHOKEPOINT
+   * TOXIC_COMBINATION, SENSITIVE_DATA_RISK, CHOKEPOINT, EXTERNAL_EXPOSURE
    *
    * @param self::FINDING_CLASS_* $findingClass
    */
@@ -1271,6 +1352,22 @@ class Finding extends \Google\Collection
     return $this->parentDisplayName;
   }
   /**
+   * PolicyViolationSummary associated with the finding.
+   *
+   * @param PolicyViolationSummary $policyViolationSummary
+   */
+  public function setPolicyViolationSummary(PolicyViolationSummary $policyViolationSummary)
+  {
+    $this->policyViolationSummary = $policyViolationSummary;
+  }
+  /**
+   * @return PolicyViolationSummary
+   */
+  public function getPolicyViolationSummary()
+  {
+    return $this->policyViolationSummary;
+  }
+  /**
    * Represents operating system processes associated with the Finding.
    *
    * @param Process[] $processes
@@ -1306,6 +1403,22 @@ class Finding extends \Google\Collection
   public function getResourceName()
   {
     return $this->resourceName;
+  }
+  /**
+   * Secret associated with the finding.
+   *
+   * @param Secret $secret
+   */
+  public function setSecret(Secret $secret)
+  {
+    $this->secret = $secret;
+  }
+  /**
+   * @return Secret
+   */
+  public function getSecret()
+  {
+    return $this->secret;
   }
   /**
    * Output only. User specified security marks. These marks are entirely

@@ -87,6 +87,16 @@ class GoogleCloudDiscoveryengineV1UserEvent extends \Google\Collection
    */
   public $engine;
   /**
+   * Optional. Represents the entity for customers that may run multiple
+   * different entities, domains, sites or regions, for example, `Google US`,
+   * `Google Ads`, `Waymo`, `google.com`, `youtube.com`, etc. We recommend that
+   * you set `entity` to get better per-entity search, completion, and
+   * prediction results.
+   *
+   * @var string
+   */
+  public $entity;
+  /**
    * Only required for UserEventService.ImportUserEvents method. Timestamp of
    * when the user event happened.
    *
@@ -109,10 +119,10 @@ class GoogleCloudDiscoveryengineV1UserEvent extends \Google\Collection
    */
   public $eventType;
   /**
-   * The filter syntax consists of an expression language for constructing a
-   * predicate from one or more fields of the documents being filtered. One
-   * example is for `search` events, the associated SearchRequest may contain a
-   * filter expression in SearchRequest.filter conforming to
+   * Optional. The filter syntax consists of an expression language for
+   * constructing a predicate from one or more fields of the documents being
+   * filtered. One example is for `search` events, the associated SearchRequest
+   * may contain a filter expression in SearchRequest.filter conforming to
    * https://google.aip.dev/160#filtering. Similarly, for `view-item-list`
    * events that are generated from a RecommendRequest, this field may be
    * populated directly from RecommendRequest.filter conforming to
@@ -365,6 +375,26 @@ class GoogleCloudDiscoveryengineV1UserEvent extends \Google\Collection
     return $this->engine;
   }
   /**
+   * Optional. Represents the entity for customers that may run multiple
+   * different entities, domains, sites or regions, for example, `Google US`,
+   * `Google Ads`, `Waymo`, `google.com`, `youtube.com`, etc. We recommend that
+   * you set `entity` to get better per-entity search, completion, and
+   * prediction results.
+   *
+   * @param string $entity
+   */
+  public function setEntity($entity)
+  {
+    $this->entity = $entity;
+  }
+  /**
+   * @return string
+   */
+  public function getEntity()
+  {
+    return $this->entity;
+  }
+  /**
    * Only required for UserEventService.ImportUserEvents method. Timestamp of
    * when the user event happened.
    *
@@ -407,10 +437,10 @@ class GoogleCloudDiscoveryengineV1UserEvent extends \Google\Collection
     return $this->eventType;
   }
   /**
-   * The filter syntax consists of an expression language for constructing a
-   * predicate from one or more fields of the documents being filtered. One
-   * example is for `search` events, the associated SearchRequest may contain a
-   * filter expression in SearchRequest.filter conforming to
+   * Optional. The filter syntax consists of an expression language for
+   * constructing a predicate from one or more fields of the documents being
+   * filtered. One example is for `search` events, the associated SearchRequest
+   * may contain a filter expression in SearchRequest.filter conforming to
    * https://google.aip.dev/160#filtering. Similarly, for `view-item-list`
    * events that are generated from a RecommendRequest, this field may be
    * populated directly from RecommendRequest.filter conforming to

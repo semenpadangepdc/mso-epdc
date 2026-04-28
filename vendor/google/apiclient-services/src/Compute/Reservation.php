@@ -20,10 +20,27 @@ namespace Google\Service\Compute;
 class Reservation extends \Google\Collection
 {
   /**
+   * Intel Trust Domain Extensions.
+   */
+  public const CONFIDENTIAL_COMPUTE_TYPE_CONFIDENTIAL_COMPUTE_TYPE_TDX = 'CONFIDENTIAL_COMPUTE_TYPE_TDX';
+  public const CONFIDENTIAL_COMPUTE_TYPE_CONFIDENTIAL_COMPUTE_TYPE_UNSPECIFIED = 'CONFIDENTIAL_COMPUTE_TYPE_UNSPECIFIED';
+  /**
    * The reserved capacity is made up of densely deployed reservation blocks.
    */
   public const DEPLOYMENT_TYPE_DENSE = 'DENSE';
   public const DEPLOYMENT_TYPE_DEPLOYMENT_TYPE_UNSPECIFIED = 'DEPLOYMENT_TYPE_UNSPECIFIED';
+  /**
+   * No early access.
+   */
+  public const EARLY_ACCESS_MAINTENANCE_NO_EARLY_ACCESS = 'NO_EARLY_ACCESS';
+  /**
+   * Wave 1: Fastest notification period
+   */
+  public const EARLY_ACCESS_MAINTENANCE_WAVE1 = 'WAVE1';
+  /**
+   * Wave 2: Medium notification period
+   */
+  public const EARLY_ACCESS_MAINTENANCE_WAVE2 = 'WAVE2';
   /**
    * CAPACITY_OPTIMIZED capacity leverages redundancies (e.g. power, cooling) at
    * the data center during normal operating conditions. In the event of
@@ -81,14 +98,18 @@ class Reservation extends \Google\Collection
   protected $aggregateReservationType = AllocationAggregateReservation::class;
   protected $aggregateReservationDataType = '';
   /**
-   * [Output Only] Full or partial URL to a parent commitment. This field
-   * displays for reservations that are tied to a commitment.
+   * Output only. [Output Only] Full or partial URL to a parent commitment. This
+   * field displays for reservations that are tied to a commitment.
    *
    * @var string
    */
   public $commitment;
   /**
-   * [Output Only] Creation timestamp inRFC3339 text format.
+   * @var string
+   */
+  public $confidentialComputeType;
+  /**
+   * Output only. [Output Only] Creation timestamp inRFC3339 text format.
    *
    * @var string
    */
@@ -116,6 +137,14 @@ class Reservation extends \Google\Collection
    */
   public $description;
   /**
+   * Indicates the early access maintenance for the reservation. If this field
+   * is absent or set to NO_EARLY_ACCESS, the reservation is not enrolled in
+   * early access maintenance and the standard notice applies.
+   *
+   * @var string
+   */
+  public $earlyAccessMaintenance;
+  /**
    * Indicates whether Compute Engine allows unplanned maintenance for your VMs;
    * for example, to fix hardware errors.
    *
@@ -123,22 +152,22 @@ class Reservation extends \Google\Collection
    */
   public $enableEmergentMaintenance;
   /**
-   * [Output Only] The unique identifier for the resource. This identifier is
-   * defined by the server.
+   * Output only. [Output Only] The unique identifier for the resource. This
+   * identifier is defined by the server.
    *
    * @var string
    */
   public $id;
   /**
-   * [Output Only] Type of the resource. Alwayscompute#reservations for
-   * reservations.
+   * Output only. [Output Only] Type of the resource. Alwayscompute#reservations
+   * for reservations.
    *
    * @var string
    */
   public $kind;
   /**
-   * [Output Only] Full or partial URL to parent commitments. This field
-   * displays for reservations that are tied to multiple commitments.
+   * Output only. [Output Only] Full or partial URL to parent commitments. This
+   * field displays for reservations that are tied to multiple commitments.
    *
    * @var string[]
    */
@@ -155,6 +184,8 @@ class Reservation extends \Google\Collection
    * @var string
    */
   public $name;
+  protected $paramsType = ReservationParams::class;
+  protected $paramsDataType = '';
   /**
    * Protection tier for the workload which specifies the workload expectations
    * in the event of infrastructure failures at data center (e.g. power and/or
@@ -176,7 +207,7 @@ class Reservation extends \Google\Collection
   protected $resourceStatusType = AllocationResourceStatus::class;
   protected $resourceStatusDataType = '';
   /**
-   * [Output Only] Reserved for future use.
+   * Output only. [Output Only] Reserved for future use.
    *
    * @var bool
    */
@@ -188,7 +219,8 @@ class Reservation extends \Google\Collection
    */
   public $schedulingType;
   /**
-   * [Output Only] Server-defined fully-qualified URL for this resource.
+   * Output only. [Output Only] Server-defined fully-qualified URL for this
+   * resource.
    *
    * @var string
    */
@@ -206,11 +238,11 @@ class Reservation extends \Google\Collection
    */
   public $specificReservationRequired;
   /**
-   * [Output Only] The status of the reservation.              - CREATING:
-   * Reservation resources are being        allocated.      - READY: Reservation
-   * resources have been allocated,        and the reservation is ready for use.
-   * - DELETING: Reservation deletion is in progress.      - UPDATING:
-   * Reservation update is in progress.
+   * Output only. [Output Only] The status of the reservation.              -
+   * CREATING: Reservation resources are being        allocated.      - READY:
+   * Reservation resources have been allocated,        and the reservation is
+   * ready for use.      - DELETING: Reservation deletion is in progress.      -
+   * UPDATING: Reservation update is in progress.
    *
    * @var string
    */
@@ -257,8 +289,8 @@ class Reservation extends \Google\Collection
     return $this->aggregateReservation;
   }
   /**
-   * [Output Only] Full or partial URL to a parent commitment. This field
-   * displays for reservations that are tied to a commitment.
+   * Output only. [Output Only] Full or partial URL to a parent commitment. This
+   * field displays for reservations that are tied to a commitment.
    *
    * @param string $commitment
    */
@@ -274,7 +306,21 @@ class Reservation extends \Google\Collection
     return $this->commitment;
   }
   /**
-   * [Output Only] Creation timestamp inRFC3339 text format.
+   * @param self::CONFIDENTIAL_COMPUTE_TYPE_* $confidentialComputeType
+   */
+  public function setConfidentialComputeType($confidentialComputeType)
+  {
+    $this->confidentialComputeType = $confidentialComputeType;
+  }
+  /**
+   * @return self::CONFIDENTIAL_COMPUTE_TYPE_*
+   */
+  public function getConfidentialComputeType()
+  {
+    return $this->confidentialComputeType;
+  }
+  /**
+   * Output only. [Output Only] Creation timestamp inRFC3339 text format.
    *
    * @param string $creationTimestamp
    */
@@ -359,6 +405,26 @@ class Reservation extends \Google\Collection
     return $this->description;
   }
   /**
+   * Indicates the early access maintenance for the reservation. If this field
+   * is absent or set to NO_EARLY_ACCESS, the reservation is not enrolled in
+   * early access maintenance and the standard notice applies.
+   *
+   * Accepted values: NO_EARLY_ACCESS, WAVE1, WAVE2
+   *
+   * @param self::EARLY_ACCESS_MAINTENANCE_* $earlyAccessMaintenance
+   */
+  public function setEarlyAccessMaintenance($earlyAccessMaintenance)
+  {
+    $this->earlyAccessMaintenance = $earlyAccessMaintenance;
+  }
+  /**
+   * @return self::EARLY_ACCESS_MAINTENANCE_*
+   */
+  public function getEarlyAccessMaintenance()
+  {
+    return $this->earlyAccessMaintenance;
+  }
+  /**
    * Indicates whether Compute Engine allows unplanned maintenance for your VMs;
    * for example, to fix hardware errors.
    *
@@ -376,8 +442,8 @@ class Reservation extends \Google\Collection
     return $this->enableEmergentMaintenance;
   }
   /**
-   * [Output Only] The unique identifier for the resource. This identifier is
-   * defined by the server.
+   * Output only. [Output Only] The unique identifier for the resource. This
+   * identifier is defined by the server.
    *
    * @param string $id
    */
@@ -393,8 +459,8 @@ class Reservation extends \Google\Collection
     return $this->id;
   }
   /**
-   * [Output Only] Type of the resource. Alwayscompute#reservations for
-   * reservations.
+   * Output only. [Output Only] Type of the resource. Alwayscompute#reservations
+   * for reservations.
    *
    * @param string $kind
    */
@@ -410,8 +476,8 @@ class Reservation extends \Google\Collection
     return $this->kind;
   }
   /**
-   * [Output Only] Full or partial URL to parent commitments. This field
-   * displays for reservations that are tied to multiple commitments.
+   * Output only. [Output Only] Full or partial URL to parent commitments. This
+   * field displays for reservations that are tied to multiple commitments.
    *
    * @param string[] $linkedCommitments
    */
@@ -447,6 +513,23 @@ class Reservation extends \Google\Collection
   public function getName()
   {
     return $this->name;
+  }
+  /**
+   * Input only. Additional params passed with the request, but not persisted as
+   * part of resource payload.
+   *
+   * @param ReservationParams $params
+   */
+  public function setParams(ReservationParams $params)
+  {
+    $this->params = $params;
+  }
+  /**
+   * @return ReservationParams
+   */
+  public function getParams()
+  {
+    return $this->params;
   }
   /**
    * Protection tier for the workload which specifies the workload expectations
@@ -504,7 +587,7 @@ class Reservation extends \Google\Collection
     return $this->resourcePolicies;
   }
   /**
-   * [Output Only] Status information for Reservation resource.
+   * Output only. [Output Only] Status information for Reservation resource.
    *
    * @param AllocationResourceStatus $resourceStatus
    */
@@ -520,7 +603,7 @@ class Reservation extends \Google\Collection
     return $this->resourceStatus;
   }
   /**
-   * [Output Only] Reserved for future use.
+   * Output only. [Output Only] Reserved for future use.
    *
    * @param bool $satisfiesPzs
    */
@@ -554,7 +637,8 @@ class Reservation extends \Google\Collection
     return $this->schedulingType;
   }
   /**
-   * [Output Only] Server-defined fully-qualified URL for this resource.
+   * Output only. [Output Only] Server-defined fully-qualified URL for this
+   * resource.
    *
    * @param string $selfLink
    */
@@ -622,11 +706,11 @@ class Reservation extends \Google\Collection
     return $this->specificReservationRequired;
   }
   /**
-   * [Output Only] The status of the reservation.              - CREATING:
-   * Reservation resources are being        allocated.      - READY: Reservation
-   * resources have been allocated,        and the reservation is ready for use.
-   * - DELETING: Reservation deletion is in progress.      - UPDATING:
-   * Reservation update is in progress.
+   * Output only. [Output Only] The status of the reservation.              -
+   * CREATING: Reservation resources are being        allocated.      - READY:
+   * Reservation resources have been allocated,        and the reservation is
+   * ready for use.      - DELETING: Reservation deletion is in progress.      -
+   * UPDATING: Reservation update is in progress.
    *
    * Accepted values: CREATING, DELETING, INVALID, READY, UPDATING
    *
