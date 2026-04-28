@@ -31,10 +31,9 @@ return new class extends Migration
             $table->date('estimated_delivery')->nullable();
             $table->double('estimasi_harga')->nullable();
             $table->string('nama_vendor')->nullable();
-            
-            $table->string('status', 50)->default('Open');
-            $table->check("status IN ('Open','Closed')");
-            
+
+            $table->enum('status', ['Open', 'Closed'])->default('Open');
+
             $table->timestamps();
         });
     }

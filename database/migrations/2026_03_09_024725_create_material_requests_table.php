@@ -20,22 +20,19 @@ return new class extends Migration
             $table->string('no_notifikasi')->nullable();
             $table->integer('qty')->nullable();
             $table->string('uom')->nullable();
-            
-            $table->string('pengadaan', 50)->nullable();
-            $table->check("pengadaan IN ('Jasa','Barang-Jasa','Via Peng.Barang','Via Capex')");
-            
-            $table->string('model', 50)->nullable();
-            $table->check("model IN ('Tender','TL')");
-            
+
+            $table->enum('pengadaan', ['Jasa', 'Barang-Jasa', 'Via Peng.Barang', 'Via Capex'])->nullable();
+
+            $table->enum('model', ['Tender', 'TL'])->nullable();
+
             $table->string('nomor_reservasi')->nullable();
             $table->string('nomor_pr')->nullable();
             $table->string('nomor_po')->nullable();
             $table->decimal('estimasi_harga', 15, 2)->nullable();
             $table->string('nama_vendor')->nullable();
-            
-            $table->string('status', 50)->default('Open');
-            $table->check("status IN ('Open','Closed')");
-            
+
+            $table->enum('status', ['Open', 'Closed'])->default('Open');
+
             $table->timestamps();
         });
     }

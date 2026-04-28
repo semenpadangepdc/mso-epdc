@@ -16,14 +16,13 @@ class CreateMsoFindingsTable extends Migration
             $table->foreignId('material_master_id')->nullable()->constrained('material_master')->nullOnDelete();
             $table->text('temuan');
             $table->text('action')->nullable();
-            
-            $table->string('status_perbaikan', 50)->default('Pending');
-            $table->check("status_perbaikan IN ('Pending','Done','On Hold')");
-            
+
+            $table->enum('status_perbaikan', ['Pending', 'Done', 'On Hold'])->default('Pending');
+
             $table->timestamps();
         });
     }
-    
+
     public function down()
     {
         Schema::dropIfExists('mso_findings');

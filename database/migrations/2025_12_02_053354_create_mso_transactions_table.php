@@ -15,16 +15,13 @@ class CreateMsoTransactionsTable extends Migration
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
             $table->foreignId('nomenclature_id')->constrained('nomenclatures')->onDelete('cascade');
             $table->text('description')->nullable();
-            
-            // PostgreSQL: gunakan VARCHAR dengan CHECK constraint
-            $table->string('status_peralatan', 50)->default('Active Operation');
-            $table->check("status_peralatan IN ('Active Operation','Ready Standby','Broken - Eliminated')");
-            
+
+            $table->enum('status_peralatan', ['Active Operation', 'Ready Standby', 'Broken - Eliminated'])->default('Active Operation');
+
             $table->foreignId('maintenance_type_id')->constrained('maintenance_types')->onDelete('cascade');
-            
-            $table->string('status_pekerjaan', 50)->default('Open');
-            $table->check("status_pekerjaan IN ('Open','Partial Finish','Closed')");
-            
+
+            $table->enum('status_pekerjaan', ['Open', 'Partial Finish', 'Closed'])->default('Open');
+
             $table->dateTime('start_date')->nullable();
             $table->dateTime('finish_date')->nullable();
             $table->time('start_hour')->nullable();
@@ -34,7 +31,7 @@ class CreateMsoTransactionsTable extends Migration
             $table->timestamps();
         });
     }
-    
+
     public function down()
     {
         Schema::dropIfExists('mso_transactions');
