@@ -9,25 +9,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('production_calendars', function (Blueprint $table) {
-
             if (!Schema::hasColumn('production_calendars', 'total_days')) {
-                $table->integer('total_days');
+                $table->integer('total_days')->nullable();
             }
 
             if (!Schema::hasColumn('production_calendars', 'planned_running_days')) {
-                $table->integer('planned_running_days');
+                $table->integer('planned_running_days')->nullable();
             }
 
             if (!Schema::hasColumn('production_calendars', 'planned_shutdown_days')) {
-                $table->integer('planned_shutdown_days');
+                $table->integer('planned_shutdown_days')->nullable();
             }
 
             if (!Schema::hasColumn('production_calendars', 'planned_production_hours')) {
-                $table->integer('planned_production_hours');
+                $table->integer('planned_production_hours')->nullable();
             }
 
             if (!Schema::hasColumn('production_calendars', 'planned_downtime_hours')) {
-                $table->integer('planned_downtime_hours');
+                $table->integer('planned_downtime_hours')->nullable();
             }
         });
     }

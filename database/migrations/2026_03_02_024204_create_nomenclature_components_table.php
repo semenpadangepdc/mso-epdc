@@ -18,7 +18,6 @@ return new class extends Migration
                   ->constrained()
                   ->cascadeOnDelete();
 
-            // Per-component pivot fields
             $table->string('material_number', 50)->nullable();
             $table->string('description', 255)->nullable();
 

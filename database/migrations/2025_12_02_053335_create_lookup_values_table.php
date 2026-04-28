@@ -9,9 +9,9 @@ class CreateLookupValuesTable extends Migration
     {
         Schema::create('lookup_values', function (Blueprint $table) {
             $table->id();
-            $table->string('type');      // e.g. report_by, condition, source, prioritas
-            $table->string('key');       // internal key
-            $table->string('value');     // displayed value
+            $table->string('type');
+            $table->string('key');
+            $table->string('value');
             $table->timestamps();
         });
     }

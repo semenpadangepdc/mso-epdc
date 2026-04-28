@@ -22,4 +22,3 @@ class AddIdtransColumnsToMsoTransactionsTable extends Migration
         });
     }
 }
-

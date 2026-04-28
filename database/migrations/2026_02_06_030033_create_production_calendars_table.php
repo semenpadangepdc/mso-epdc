@@ -14,11 +14,9 @@ return new class extends Migration
             $table->foreignId('plant_id')->constrained()->cascadeOnDelete();
             $table->foreignId('area_id')->constrained()->cascadeOnDelete();
 
-            // ⬇️ INI WAJIB ADA DARI AWAL
             $table->integer('year');
             $table->integer('month');
 
-            // kolom lama (kalau masih mau disimpan)
             $table->date('date')->nullable();
 
             $table->timestamps();

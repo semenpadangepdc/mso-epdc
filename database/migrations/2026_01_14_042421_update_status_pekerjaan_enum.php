@@ -7,29 +7,17 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        // MySQL tidak support ALTER ENUM langsung
-        // Jadi kita ubah ke VARCHAR dulu, lalu kembali ke ENUM
-        
-        DB::statement("ALTER TABLE `mso_transactions` 
-            MODIFY `status_pekerjaan` VARCHAR(50) NOT NULL DEFAULT 'Open'");
-        
-        // Sekarang ubah kembali ke ENUM dengan nilai baru
-        DB::statement("ALTER TABLE `mso_transactions` 
-            MODIFY `status_pekerjaan` ENUM('Open','On Progress','Closed') NOT NULL DEFAULT 'Open'");
+        // PostgreSQL: drop old CHECK constraint and add new one
+        DB::statement("ALTER TABLE mso_transactions DROP CONSTRAINT IF EXISTS mso_transactions_status_pekerjaan_check");
+        DB::statement("ALTER TABLE mso_transactions ALTER COLUMN status_pekerjaan SET DEFAULT 'Open'");
+        DB::statement("ALTER TABLE mso_transactions ADD CONSTRAINT mso_transactions_status_pekerjaan_check CHECK (status_pekerjaan IN ('Open','On Progress','Closed'))");
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        // Kembalikan ke ENUM lama
-        DB::statement("ALTER TABLE `mso_transactions` 
-            MODIFY `status_pekerjaan` ENUM('Open','Partial Finish','Closed') NOT NULL DEFAULT 'Open'");
+        DB::statement("ALTER TABLE mso_transactions DROP CONSTRAINT IF EXISTS mso_transactions_status_pekerjaan_check");
+        DB::statement("ALTER TABLE mso_transactions ADD CONSTRAINT mso_transactions_status_pekerjaan_check CHECK (status_pekerjaan IN ('Open','Partial Finish','Closed'))");
     }
 };

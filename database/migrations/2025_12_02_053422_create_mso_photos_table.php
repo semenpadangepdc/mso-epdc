@@ -11,7 +11,10 @@ class CreateMsoPhotosTable extends Migration
             $table->id();
             $table->foreignId('mso_transaction_id')->constrained('mso_transactions')->onDelete('cascade');
             $table->foreignId('finding_id')->nullable()->constrained('mso_findings')->nullOnDelete();
-            $table->enum('type', ['before','after']);
+            
+            $table->string('type', 50);
+            $table->check("type IN ('before','after')");
+            
             $table->string('drive_file_id')->nullable();
             $table->string('filename');
             $table->string('mime')->nullable();
@@ -20,6 +23,7 @@ class CreateMsoPhotosTable extends Migration
             $table->timestamps();
         });
     }
+    
     public function down()
     {
         Schema::dropIfExists('mso_photos');

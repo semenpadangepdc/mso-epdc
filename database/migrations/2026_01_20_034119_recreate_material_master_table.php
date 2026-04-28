@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     public function up(): void
     {
-        // ⛔ MATIKAN FOREIGN KEY CHECK
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
         Schema::dropIfExists('material_master');
 
         Schema::create('material_master', function (Blueprint $table) {
@@ -33,15 +30,10 @@ return new class extends Migration {
 
             $table->timestamps();
         });
-
-        // ✅ NYALAKAN LAGI
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     public function down(): void
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         Schema::dropIfExists('material_master');
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 };
