@@ -21,11 +21,7 @@ class DatabaseSeeder extends Seeder
             ComponentSeeder::class,
             NomenclatureTypeSeeder::class,
             PermissionSeeder::class,
-            MaterialMasterExcelSeeder::class,
-            UserSeeder::class,
-            ProductionCalendarSeeder::class,
-            MsoTransactionSeeder::class,
-            MaterialMonitoringSeeder::class
+            MaterialMasterExcelSeeder::class
         ]);
 
     }
