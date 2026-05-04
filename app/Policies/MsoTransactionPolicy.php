@@ -24,11 +24,13 @@ class MsoTransactionPolicy
 
     public function update(User $user, MsoTransaction $mso)
     {
-        return $user->hasAnyRole(['Admin','Supervisor']);
+        // Operator juga boleh update MSO (sesuai "hanya boleh mengisi mso")
+        return $user->hasAnyRole(['Admin','Supervisor','Operator']);
     }
 
     public function delete(User $user, MsoTransaction $mso)
     {
+        // Hanya Admin yang boleh delete (optional, bisa juga Supervisor)
         return $user->hasRole('Admin');
     }
 }

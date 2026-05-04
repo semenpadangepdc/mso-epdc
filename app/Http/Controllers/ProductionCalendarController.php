@@ -12,6 +12,7 @@ class ProductionCalendarController extends Controller
 {
     public function index()
     {
+        // Semua role yang login boleh melihat
         $calendars = ProductionCalendar::with(['plant','area'])
             ->orderByDesc('year')
             ->orderByDesc('month')
@@ -22,6 +23,11 @@ class ProductionCalendarController extends Controller
 
     public function create()
     {
+        // Hanya Admin dan Supervisor
+        if (!auth()->user()->hasAnyRole(['Admin','Supervisor'])) {
+            abort(403, 'Unauthorized');
+        }
+
         return view('production-calendar.create', [
             'plants' => Plant::all(),
             'areas'  => Area::all(),
@@ -30,6 +36,11 @@ class ProductionCalendarController extends Controller
 
     public function store(Request $request)
     {
+        // Hanya Admin dan Supervisor
+        if (!auth()->user()->hasAnyRole(['Admin','Supervisor'])) {
+            abort(403);
+        }
+
         $request->validate([
             'plant_id'              => 'required|exists:plants,id',
             'area_id'               => 'required|exists:areas,id',
@@ -78,6 +89,11 @@ class ProductionCalendarController extends Controller
 
     public function edit(string $id)
     {
+        // Hanya Admin dan Supervisor
+        if (!auth()->user()->hasAnyRole(['Admin','Supervisor'])) {
+            abort(403);
+        }
+
         $calendar = ProductionCalendar::with(['plant', 'area'])->findOrFail($id);
 
         return view('production-calendar.edit', [
@@ -89,6 +105,11 @@ class ProductionCalendarController extends Controller
 
     public function update(Request $request, string $id)
     {
+        // Hanya Admin dan Supervisor
+        if (!auth()->user()->hasAnyRole(['Admin','Supervisor'])) {
+            abort(403);
+        }
+
         $calendar = ProductionCalendar::findOrFail($id);
 
         $request->validate([

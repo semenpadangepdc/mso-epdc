@@ -396,11 +396,21 @@
                     <td>{{ $row->abnormality ?? '-' }}</td>
                     <td>{{ $row->action ?? '-' }}</td>
                     <td style="font-weight:600; color:var(--dark-red);">{{ $row->material_master ?? '-' }}</td>
-                    <td>
+                    <td style="text-align:center;">
+                        {{-- Tombol Detail: semua role yang login boleh melihat --}}
                         <a href="{{ route('monitoring.detail', $row->trans_id) }}"
                            class="btn-detail">
                             📋 Detail
                         </a>
+
+                        {{-- Tombol Export: hanya Admin dan Supervisor --}}
+                        @canany(['Admin', 'Supervisor'])
+                            <a href="{{ route('monitoring.export', $row->trans_id) }}"
+                               class="btn-detail"
+                               style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); margin-left: 0.25rem;">
+                                📤 Export
+                            </a>
+                        @endcanany
                     </td>
                 </tr>
                 @empty

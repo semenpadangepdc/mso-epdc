@@ -363,6 +363,51 @@
             </a>
         </div>
 
+        @role('Admin')
+        <div style="margin-bottom: 1rem; text-align: right;">
+            <button type="button" class="btn-save" style="background: #4F46E5;" data-bs-toggle="modal" data-bs-target="#addComponentModal">
+                + Tambah Komponen Baru
+            </button>
+        </div>
+
+        <!-- Modal Tambah Komponen Baru -->
+        <div class="modal fade" id="addComponentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('nomenclatures.add-component', $nomenclature->id) }}">
+                        @csrf
+                        <div class="modal-header" style="background: #DC2626; color: white;">
+                            <h5 class="modal-title">Tambah Komponen Baru</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Komponen *</label>
+                                <input type="text" name="component_name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tipe Komponen</label>
+                                <input type="text" name="component_type" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Material Number</label>
+                                <input type="text" name="material_number" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Deskripsi</label>
+                                <textarea name="description" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-cancel" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn-save">Simpan Komponen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endrole
+
         @if(session('success'))
             <div style="background:#D1FAE5;color:#065F46;padding:0.85rem 1.25rem;border-radius:8px;margin-bottom:1.5rem;font-size:0.875rem;font-weight:600;border-left:4px solid #10B981;">
                 &#10003; {{ session('success') }}

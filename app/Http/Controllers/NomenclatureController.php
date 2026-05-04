@@ -71,8 +71,8 @@ class NomenclatureController extends Controller
         $nomenclature->components()->sync($syncData);
 
         $nomenclature->update([
-            'description' => $request->description,
-            'type'        => $request->type,
+            'description'    => $request->description,
+            'type'           => $request->type,
             'default_status' => $request->default_status,
         ]);
 
@@ -80,5 +80,36 @@ class NomenclatureController extends Controller
             'success',
             'Specification updated successfully'
         );
+    }
+
+    public function addComponent(Request $request, Nomenclature $nomenclature)
+    {
+        // Hanya Admin (atau Supervisor) yang boleh
+        if (!auth()->user()->hasRole('Admin')) {
+            abort(403, 'Only Admin can add new components');
+        }
+
+        $request->validate([
+            'component_name'  => 'required|string|max:255',
+            'component_type'  => 'nullable|string|max:100',
+            'material_number' => 'nullable|string|max:50',
+            'description'     => 'nullable|string|max:255',
+        ]);
+
+        // Buat component baru
+        $component = Component::create([
+            'name' => $request->component_name,
+            'type' => $request->component_type,
+        ]);
+
+        // Attach ke nomenclature dengan data pivot
+        $nomenclature->components()->attach($component->id, [
+            'material_number' => $request->material_number,
+            'description'     => $request->description,
+        ]);
+
+        return redirect()
+            ->route('nomenclatures.specification', $nomenclature->id)
+            ->with('success', 'Komponen baru berhasil ditambahkan ke nomenclature ini.');
     }
 }

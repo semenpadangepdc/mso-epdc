@@ -86,6 +86,10 @@ Route::post('/nomenclatures/{nomenclature}/specification',
     [NomenclatureController::class, 'updateSpecification']
 )->name('nomenclatures.specification.update');
 
+Route::post('/nomenclatures/{nomenclature}/add-component',
+    [NomenclatureController::class, 'addComponent']
+)->name('nomenclatures.add-component')->middleware('auth');
+
 Route::get('/nomenclatures', [NomenclatureController::class, 'index'])
     ->middleware('auth')
     ->name('nomenclatures.index');

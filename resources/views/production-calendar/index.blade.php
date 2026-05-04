@@ -7,20 +7,12 @@
             
             <h2 class="text-xl font-bold mb-4">Production Calendar</h2>
 
-            {{-- 🔍 DEBUG INFO (Hapus setelah masalah selesai) --}}
-            <div style="background: #fff3cd; padding: 15px; margin: 10px 0; border-left: 4px solid #ffc107;">
-                <strong>🔍 DEBUG INFO:</strong><br>
-                Total Records: {{ $calendars->total() }}<br>
-                Current Page: {{ $calendars->currentPage() }}<br>
-                Per Page: {{ $calendars->perPage() }}<br>
-                Is Empty: {{ $calendars->isEmpty() ? 'YES ⚠️' : 'NO ✅' }}
-            </div>
-            {{-- END DEBUG --}}
-
-            <a href="{{ route('production-calendar.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 mb-3">
-                + Tambah Kalender
-            </a>
+            @canany(['Admin', 'Supervisor'])
+                <a href="{{ route('production-calendar.create') }}"
+                   class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 mb-3">
+                    + Tambah Kalender
+                </a>
+            @endcanany
 
             @if($calendars->isEmpty())
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
@@ -88,11 +80,15 @@
                                     {{ $c->planned_downtime_hours }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ route('production-calendar.edit',$c) }}" 
-                                       class="text-indigo-600 hover:text-indigo-900"
-                                       title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                    @canany(['Admin', 'Supervisor'])
+                                        <a href="{{ route('production-calendar.edit',$c) }}" 
+                                           class="text-indigo-600 hover:text-indigo-900"
+                                           title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    @else
+                                        <span class="text-gray-400">-</span>
+                                    @endcanany
                                 </td>
                             </tr>
                             @endforeach
