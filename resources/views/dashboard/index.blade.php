@@ -890,10 +890,10 @@
     ==================================================================== --}}
     <div class="two-col" style="margin-bottom:2rem;">
 
-        {{-- AVAILABILITY PER AREA --}}
+        {{-- AVAILABILITY MAIN FILTER (per nomenclature BHF/ESP per area+plant) --}}
         <div class="panel" style="margin-bottom:0;">
             <div class="panel-header">
-                <h2 class="panel-title">⚙️ Availability per Area</h2>
+                <h2 class="panel-title">⚙️ Availability Main Filter</h2>
                 <span class="panel-tag">
                     @if(($filters['period'] ?? 'yearly') === 'monthly')
                         {{ \Carbon\Carbon::create()->month($filters['month'] ?? date('n'))->translatedFormat('F') }}
@@ -902,20 +902,122 @@
                 </span>
             </div>
             <div class="panel-body">
-                @if(count($availability))
+
+                {{-- Filter: Type (BHF / ESP) + Nomenclature spesifik --}}
+                @php
+                    $availMainFilter    = $availability['availability_main_filter'] ?? collect();
+
+                    // Daftar type unik (Main Filter = BHF, ESP)
+                    $mfTypes            = $availMainFilter->pluck('nomenclature_type')->unique()->sort()->values();
+                    $selectedMfType     = $filters['mf_type'] ?? '';
+
+                    // Setelah filter type, ambil daftar nomenclature untuk dropdown kedua
+                    $filteredByType     = $selectedMfType
+                        ? $availMainFilter->filter(fn($u) => ($u['nomenclature_type'] ?? '') === $selectedMfType)->values()
+                        : $availMainFilter;
+
+                    $nomenclatureOpts   = $filteredByType->map(fn($u) => [
+                        'id'    => $u['nomenclature_id'],
+                        'label' => $u['label'],
+                    ])->sortBy('label')->values();
+
+                    $selectedNomId      = (int)($filters['nomenclature_id'] ?? 0);
+
+                    // Data akhir yang ditampilkan
+                    $filteredMainFilter = $selectedNomId
+                        ? $filteredByType->filter(fn($u) => ($u['nomenclature_id'] ?? 0) == $selectedNomId)->values()
+                        : $filteredByType;
+                @endphp
+
+                {{-- Filter row --}}
+                <div style="margin-bottom:1rem;">
+                    <form method="GET" action="{{ route('dashboard') }}"
+                          style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;"
+                          id="availMfForm">
+
+                        {{-- Pertahankan semua filter aktif kecuali yang kita ganti --}}
+                        @foreach(request()->except(['mf_type','nomenclature_id']) as $k => $v)
+                            <input type="hidden" name="{{ $k }}" value="{{ $v }}">
+                        @endforeach
+
+                        {{-- Dropdown 1: Type (BHF / ESP) --}}
+                        @if($mfTypes->count() > 1)
+                        <select name="mf_type" class="filter-select"
+                                style="font-size:0.8rem; padding:0.45rem 2rem 0.45rem 0.75rem;"
+                                onchange="document.getElementById('availMfForm').submit()">
+                            <option value="">— Semua Type —</option>
+                            @foreach($mfTypes as $t)
+                                <option value="{{ $t }}" {{ $selectedMfType === $t ? 'selected' : '' }}>
+                                    {{ $t }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @endif
+
+                        {{-- Dropdown 2: Nomenclature spesifik --}}
+                        @if($nomenclatureOpts->count())
+                        <select name="nomenclature_id" class="filter-select"
+                                style="font-size:0.8rem; padding:0.45rem 2rem 0.45rem 0.75rem;"
+                                onchange="document.getElementById('availMfForm').submit()">
+                            <option value="">— Semua Unit —</option>
+                            @foreach($nomenclatureOpts as $opt)
+                                <option value="{{ $opt['id'] }}"
+                                    {{ $selectedNomId == $opt['id'] ? 'selected' : '' }}>
+                                    {{ $opt['label'] }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @endif
+
+                        {{-- Reset link --}}
+                        @if($selectedMfType || $selectedNomId)
+                            <a href="{{ route('dashboard', request()->except(['mf_type','nomenclature_id'])) }}"
+                               style="font-size:0.78rem; color:var(--primary-red); font-weight:600; text-decoration:none;">
+                                ✕ Reset
+                            </a>
+                        @endif
+
+                    </form>
+                </div>
+
+                @if($filteredMainFilter->count())
                     <div class="avail-grid">
-                        @foreach($availability as $avail)
+                        @foreach($filteredMainFilter as $avail)
                             @php
-                                $pct      = $avail['availability'] ?? 0;
-                                $cls      = $pct >= 90 ? 'avail-good' : ($pct >= 75 ? 'avail-medium' : 'avail-low');
-                                $barClass = $pct >= 90 ? 'bar-green' : ($pct >= 75 ? 'bar-amber' : 'bar-red');
+                                $pct      = $avail['availability'] ?? null;
+                                $cls      = is_null($pct) ? 'avail-medium'
+                                            : ($pct >= 90 ? 'avail-good' : ($pct >= 75 ? 'avail-medium' : 'avail-low'));
+                                $barClass = is_null($pct) ? 'bar-amber'
+                                            : ($pct >= 90 ? 'bar-green' : ($pct >= 75 ? 'bar-amber' : 'bar-red'));
+                                $displayPct = is_null($pct) ? '—' : number_format($pct, 1).'%';
+                                // Label: "Finish Mill 4" (nama unit) sudah informatif termasuk plant
+                                $unitLabel  = $avail['label'] ?? ($avail['nomenclature_name'] ?? '-');
+                                $typeTag    = $avail['nomenclature_type'] ?? '';
                             @endphp
                             <div class="avail-card">
-                                <div class="avail-area">{{ $avail['area'] ?? '-' }}</div>
-                                <div class="avail-pct {{ $cls }}">{{ number_format($pct, 1) }}%</div>
-                                <div class="avail-sub">Availability</div>
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:0.3rem; margin-bottom:0.25rem;">
+                                    <div class="avail-area" title="{{ $unitLabel }}" style="flex:1; min-width:0;">
+                                        {{ $unitLabel }}
+                                    </div>
+                                    @if($typeTag)
+                                    <span style="font-size:0.65rem; font-weight:700; background:var(--light-red);
+                                                 color:var(--primary-red); padding:0.1rem 0.45rem;
+                                                 border-radius:4px; white-space:nowrap; flex-shrink:0;">
+                                        {{ $typeTag }}
+                                    </span>
+                                    @endif
+                                </div>
+                                <div class="avail-pct {{ $cls }}">{{ $displayPct }}</div>
+                                <div class="avail-sub">
+                                    ⬇ {{ number_format($avail['downtime_hours'] ?? 0, 1) }}h &nbsp;|&nbsp;
+                                    {{ $avail['frequency'] ?? 0 }}x breakdown
+                                    @if($avail['area_name'] ?? null)
+                                        &nbsp;·&nbsp; {{ $avail['area_name'] }}
+                                    @endif
+                                </div>
                                 <div class="avail-bar-wrap">
-                                    <div class="avail-bar {{ $barClass }}" style="width:{{ min($pct,100) }}%;"></div>
+                                    <div class="avail-bar {{ $barClass }}"
+                                         style="width:{{ is_null($pct) ? 0 : min($pct,100) }}%;"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -926,6 +1028,7 @@
                         <div class="empty-text">Belum ada data availability</div>
                     </div>
                 @endif
+
             </div>
         </div>
 

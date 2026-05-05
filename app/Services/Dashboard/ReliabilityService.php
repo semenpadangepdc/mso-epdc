@@ -25,19 +25,21 @@ class ReliabilityService
     public function getData($filters)
     {
         $filters = is_array($filters) ? $filters : [];
-        $filters['year']   = $filters['year']   ?? now()->year;
-        $filters['period'] = $filters['period'] ?? 'yearly';
-        $filters['month']  = $filters['month']  ?? null;
-        $filters['week']   = $filters['week']   ?? null;
+        $filters['year']            = $filters['year']            ?? now()->year;
+        $filters['period']          = $filters['period']          ?? 'yearly';
+        $filters['month']           = $filters['month']           ?? null;
+        $filters['week']            = $filters['week']            ?? null;
+        $filters['nomenclature_id'] = $filters['nomenclature_id'] ?? null;
+        $filters['mf_type']         = $filters['mf_type']         ?? null;
 
         return [
             // Per Unit (nomenclature)
             'availability_unit'       => $this->getAvailabilityUnit($filters),
             'downtime_frequency_unit' => $this->getDowntimeFrequencyUnit($filters),
 
-            // Per Area
-            'availability_area'       => $this->getAvailabilityArea($filters),
-            'downtime_frequency_area' => $this->getDowntimeFrequencyArea($filters),
+            // Per Nomenclature Main Filter (BHF / ESP per area+plant)
+            'availability_main_filter' => $this->getAvailabilityMainFilter($filters),
+            'downtime_frequency_area'  => $this->getDowntimeFrequencyArea($filters),
         ];
     }
 
@@ -208,41 +210,103 @@ class ReliabilityService
 
     /*
     |--------------------------------------------------------------------------
-    | 3. Availability per Area
+    | 3. Availability Main Filter — per Nomenclature (BHF / ESP) per Area
+    |--------------------------------------------------------------------------
+    | Setiap baris = 1 nomenclature (misal "Finish Mill 4") pada 1 area,
+    | sehingga bisa langsung diketahui unit mana yang nilainya rendah.
+    |
+    | Filter opsional $filters['nomenclature_id'] untuk drilldown ke 1 unit.
     |--------------------------------------------------------------------------
     */
-    private function getAvailabilityArea(array $filters)
+    private function getAvailabilityMainFilter(array $filters)
     {
-        // Downtime per area
-        $downtimePerArea = $this->downtimeBaseQuery($filters)
+        $nomenclatureId = $filters['nomenclature_id'] ?? null;
+        $mfType         = $filters['mf_type']         ?? null;
+
+        // Downtime per nomenclature (sudah di-scope ke mainFilterTypes di downtimeBaseQuery)
+        $downtimeQuery = $this->downtimeBaseQuery($filters)
             ->select(
+                'mso_transactions.nomenclature_id',
+                'nomenclatures.name as nomenclature_name',
                 'nomenclatures.area_id',
+                'nomenclatures.type as nomenclature_type',
                 DB::raw('SUM(mso_transactions.total_duration) as total_downtime'),
                 DB::raw('COUNT(*) as frequency')
             )
-            ->groupBy('nomenclatures.area_id')
-            ->get()
-            ->keyBy('area_id');
+            ->groupBy(
+                'mso_transactions.nomenclature_id',
+                'nomenclatures.name',
+                'nomenclatures.area_id',
+                'nomenclatures.type'
+            );
 
-        // Planned hours per area
+        if ($nomenclatureId) {
+            $downtimeQuery->where('mso_transactions.nomenclature_id', $nomenclatureId);
+        }
+
+        $downtimePerUnit = $downtimeQuery->get()->keyBy('nomenclature_id');
+
+        // Planned hours per area — lalu bagi per jumlah unit sejenis di area
         $plannedPerArea = $this->getPlannedHours($filters, 'area_id');
 
-        // Gabungkan — semua area yang punya planned hours ditampilkan
-        return $plannedPerArea->map(function ($planned, $areaId) use ($downtimePerArea) {
-            $downtime     = $downtimePerArea[$areaId]->total_downtime ?? 0;
-            $frequency    = $downtimePerArea[$areaId]->frequency      ?? 0;
-            $availability = $planned > 0
-                ? round((($planned - $downtime) / $planned) * 100, 2)
-                : 0;
+        $unitCountPerArea = Nomenclature::query()
+            ->whereIn('type', $this->mainFilterTypes)
+            ->select('area_id', DB::raw('COUNT(*) as unit_count'))
+            ->groupBy('area_id')
+            ->pluck('unit_count', 'area_id');
+
+        // Ambil semua nomenclature mainFilterTypes sebagai basis baris
+        $nomenclatureQuery = Nomenclature::query()
+            ->whereIn('type', $this->mainFilterTypes)
+            ->with(['area', 'plant'])
+            ->select('id', 'name', 'area_id', 'plant_id', 'type');
+
+        if ($nomenclatureId) {
+            $nomenclatureQuery->where('id', $nomenclatureId);
+        }
+
+        if ($mfType) {
+            $nomenclatureQuery->where('type', $mfType);
+        }
+
+        $allNomenclatures = $nomenclatureQuery->get();
+
+        return $allNomenclatures->map(function ($nom) use (
+            $downtimePerUnit, $plannedPerArea, $unitCountPerArea
+        ) {
+            $areaPlanned = $plannedPerArea[$nom->area_id] ?? 0;
+            $unitCount   = $unitCountPerArea[$nom->area_id] ?? 1;
+            $plannedUnit = $unitCount > 0 ? ($areaPlanned / $unitCount) : 0;
+
+            $dt           = $downtimePerUnit[$nom->id] ?? null;
+            $downtime     = $dt->total_downtime ?? 0;
+            $frequency    = $dt->frequency      ?? 0;
+
+            $availability = $plannedUnit > 0
+                ? round((($plannedUnit - $downtime) / $plannedUnit) * 100, 2)
+                : null; // null = belum ada data planned
+
+            // Label informatif: "Finish Mill 4" atau "Finish Mill — Indarung 4"
+            $plantName = $nom->plant->name ?? null;
+            $label     = $nom->name . ($plantName ? ' — ' . $plantName : '');
 
             return [
-                'area_id'        => $areaId,
-                'planned_hours'  => round($planned, 2),
-                'downtime_hours' => round($downtime, 2),
-                'frequency'      => $frequency,
-                'availability'   => $availability,
+                'nomenclature_id'   => $nom->id,
+                'nomenclature_name' => $nom->name,
+                'nomenclature_type' => $nom->type,
+                'area_id'           => $nom->area_id,
+                'area_name'         => $nom->area->name ?? null,
+                'plant_id'          => $nom->plant_id,
+                'plant_name'        => $plantName,
+                'label'             => $label,
+                'planned_hours'     => round($plannedUnit, 2),
+                'downtime_hours'    => round($downtime, 2),
+                'frequency'         => $frequency,
+                'availability'      => $availability,
             ];
-        })->sortKeys()->values();
+        })
+        ->sortBy('label')
+        ->values();
     }
 
     /*

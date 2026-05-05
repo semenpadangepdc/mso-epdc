@@ -9,11 +9,6 @@
         <h2 class="text-2xl font-bold">Detail MSO: {{ $mso->no_mso }}</h2>
 
         <div class="space-x-2">
-            <a href="{{ route('mso.export.pdf', $mso->id) }}"
-               class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                📄 Export PDF
-            </a>
-
             <a href="{{ route('mso.edit', $mso->id) }}"
                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 ✏ Edit
