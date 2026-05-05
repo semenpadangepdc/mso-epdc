@@ -10,7 +10,6 @@
         --light-red: #FEE2E2;
     }
 
-    /* Custom styling for nav links */
     .nav-link-custom {
         display: inline-flex;
         align-items: center;
@@ -39,7 +38,6 @@
         font-size: 1rem;
     }
 
-    /* Responsive nav links */
     .responsive-nav-link-custom {
         display: flex;
         align-items: center;
@@ -80,7 +78,6 @@
         align-items: center;
     }
 
-    /* Trigger button — identik gaya dengan nav-link-custom */
     .nav-dropdown-trigger {
         display: inline-flex;
         align-items: center;
@@ -113,7 +110,6 @@
 
     .nav-dropdown-trigger i { font-size: 1rem; }
 
-    /* Chevron icon rotasi saat open */
     .nav-dropdown-trigger .chevron {
         transition: transform 0.2s ease;
         font-size: 0.75rem;
@@ -124,7 +120,6 @@
         transform: rotate(180deg);
     }
 
-    /* Dropdown panel */
     .nav-dropdown-panel {
         display: none;
         position: absolute;
@@ -144,7 +139,6 @@
         display: block;
     }
 
-    /* Item dalam dropdown */
     .nav-dropdown-item {
         display: flex;
         align-items: center;
@@ -178,14 +172,12 @@
         opacity: 0.8;
     }
 
-    /* Divider antar grup item */
     .nav-dropdown-divider {
         border: none;
         border-top: 1px solid #F3F4F6;
         margin: 0.25rem 0;
     }
 
-    /* Label grup dalam dropdown */
     .nav-dropdown-group-label {
         padding: 0.5rem 1.1rem 0.25rem;
         font-size: 0.7rem;
@@ -271,7 +263,7 @@
 
     .responsive-sub-item i { font-size: 0.875rem; width: 1rem; text-align: center; }
 
-    /* Badge "New" kecil untuk menu Resume */
+    /* Badge "New" */
     .nav-badge-new {
         display: inline-flex;
         align-items: center;
@@ -285,6 +277,22 @@
         text-transform: uppercase;
         line-height: 1.4;
         margin-left: auto;
+    }
+
+    /* Badge "Admin" — ungu untuk membedakan dari badge merah */
+    .nav-badge-admin {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.1rem 0.4rem;
+        background: #7C3AED;
+        color: #fff;
+        font-size: 0.6rem;
+        font-weight: 700;
+        border-radius: 999px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        line-height: 1.4;
+        margin-left: 0.35rem;
     }
 </style>
 
@@ -376,6 +384,18 @@
                         </div>
                     </div>
                     <!-- END MONITORING DROPDOWN -->
+
+                    <!-- ==========================================
+                         MATERIAL MASTER — Admin only (Desktop)
+                         ========================================== -->
+                    @role('Admin')
+                    <a href="{{ route('material-master.index') }}"
+                       class="nav-link-custom {{ request()->routeIs('material-master.*') ? 'active' : '' }}">
+                        <i class="fas fa-database"></i>
+                        Material Master
+                        <span class="nav-badge-admin">Admin</span>
+                    </a>
+                    @endrole
 
                 </div>
             </div>
@@ -474,21 +494,18 @@
                 <div id="mobileMonitoringMenu"
                      class="responsive-sub-menu {{ request()->is('monitoring-material*') || request()->routeIs('nomenclatures.*') ? 'open' : '' }}">
 
-                    <!-- Daftar Monitoring Material -->
                     <a href="{{ route('monitoring.index') }}"
                        class="responsive-sub-item {{ request()->routeIs('monitoring.index') ? 'active' : '' }}">
                         <i class="fas fa-list-alt"></i>
                         Daftar Monitoring
                     </a>
 
-                    <!-- Resume & Lead Time -->
                     <a href="{{ route('monitoring.resume') }}"
                        class="responsive-sub-item {{ request()->routeIs('monitoring.resume') ? 'active' : '' }}">
                         <i class="fas fa-chart-pie"></i>
                         Resume &amp; Lead Time
                     </a>
 
-                    <!-- Nomenclatures -->
                     <a href="{{ route('nomenclatures.index') }}"
                        class="responsive-sub-item {{ request()->routeIs('nomenclatures.*') ? 'active' : '' }}">
                         <i class="fas fa-tags"></i>
@@ -498,6 +515,18 @@
                 </div>
             </div>
             <!-- END MONITORING MOBILE -->
+
+            <!-- ==========================================
+                 MATERIAL MASTER — Admin only (Mobile)
+                 ========================================== -->
+            @role('Admin')
+            <a href="{{ route('material-master.index') }}"
+               class="responsive-nav-link-custom {{ request()->routeIs('material-master.*') ? 'active' : '' }}">
+                <i class="fas fa-database"></i>
+                Material Master
+                <span class="nav-badge-admin" style="margin-left:0.5rem;">Admin</span>
+            </a>
+            @endrole
 
         </div>
 

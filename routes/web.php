@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NomenclatureController;
 use App\Http\Controllers\MaterialRequestController;
 use App\Http\Controllers\MaterialMonitoringController;
+use App\Http\Controllers\MaterialMasterController;
 
 
 Route::get('/', fn () => redirect()->route('mso.index'));
@@ -123,3 +124,18 @@ Route::middleware('auth')->prefix('monitoring-material')->name('monitoring.')->g
     Route::put('/{monitoring}', [MaterialMonitoringController::class, 'update'])
         ->name('update');
 });
+
+// ===============================
+// 🔐 MATERIAL MASTER ROUTES (ADMIN ONLY)
+// ===============================
+Route::middleware(['auth', 'role:Admin'])
+    ->prefix('material-master')
+    ->name('material-master.')
+    ->group(function () {
+        Route::get('/',                        [MaterialMasterController::class, 'index'])->name('index');
+        Route::get('/create',                  [MaterialMasterController::class, 'create'])->name('create');
+        Route::post('/',                       [MaterialMasterController::class, 'store'])->name('store');
+        Route::get('/{materialMaster}/edit',   [MaterialMasterController::class, 'edit'])->name('edit');
+        Route::put('/{materialMaster}',        [MaterialMasterController::class, 'update'])->name('update');
+        Route::delete('/{materialMaster}',     [MaterialMasterController::class, 'destroy'])->name('destroy');
+    });

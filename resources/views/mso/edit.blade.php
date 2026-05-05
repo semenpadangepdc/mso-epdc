@@ -528,6 +528,17 @@
         border-top: 2px solid var(--red-light);
         margin: 2rem 0;
     }
+
+    /* Select2 inside table — prevent overflow */
+    .findings-table .select2-container {
+        min-width: 200px;
+        width: 100% !important;
+    }
+
+    /* Dropdown renders above/below without clipping */
+    .select2-container--open .select2-dropdown {
+        z-index: 9999;
+    }
 </style>
 
 <!-- Select2 CSS -->
@@ -771,12 +782,12 @@
                             <form action="{{ route('mso.finding.update-material', $finding->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
-                                <select name="material_master_id" class="form-select" style="font-size:0.8rem; padding:0.5rem;">
+                                <select name="material_master_id" class="form-select material-select" style="font-size:0.8rem; padding:0.5rem;">
                                     <option value="">-- Pilih Material --</option>
                                     @foreach($materialMasters as $m)
                                         <option value="{{ $m->id }}"
                                             @selected($finding->material_master_id == $m->id)>
-                                            {{ $m->material_code }} - {{ $m->name }}
+                                            {{ $m->material_code }} - {{ $m->material_description }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -1060,6 +1071,26 @@
         document.getElementById('new-finding-rows').innerHTML = '';
         checkNewFindingTable();
     });
+
+    // ============================
+    // SELECT2 — MATERIAL MASTER
+    // ============================
+    $(document).ready(function () {
+        // Init semua .material-select existing di DOM
+        initMaterialSelect($('.material-select'));
+    });
+
+    function initMaterialSelect(el) {
+        el.select2({
+            placeholder: '🔍 Cari kode / nama material...',
+            allowClear: true,
+            width: '100%',
+            language: {
+                noResults: function () { return 'Material tidak ditemukan'; },
+                searching:  function () { return 'Mencari...'; }
+            }
+        });
+    }
 </script>
 
 @endsection
