@@ -122,17 +122,44 @@ class MsoTransactionController extends Controller
 
     public function show($id)
     {
-        $mso = MsoTransaction::with('findings.component','photos')->findOrFail($id);
+        $mso = MsoTransaction::with([
+            'findings.component',
+            'findings.materialMaster',  // ✅ tambah ini
+            'photos',
+            'plant',                    // ✅ tambah ini
+            'area',                     // ✅ tambah ini
+            'user',                     // ✅ tambah ini
+            'maintenanceType',          // ✅ tambah ini
+            'nomenclature',             // ✅ tambah ini
+        ])->findOrFail($id);
+
         $this->authorize('view', $mso);
+
         return view('mso.show', compact('mso'));
     }
 
     public function edit($id)
     {
-        $mso = MsoTransaction::findOrFail($id);
+        $mso = MsoTransaction::with('findings.component', 'findings.materialMaster')->findOrFail($id);
         $this->authorize('update', $mso);
-        $nomenclatures = Nomenclature::all();
-        return view('mso.edit', compact('mso','nomenclatures'));
+
+        // ✅ Kirim semua variable yang dibutuhkan view
+        $nomenclatures     = Nomenclature::all();
+        $plants            = Plant::all();
+        $areas             = Area::all();
+        $maintenanceTypes  = MaintenanceType::all();
+        $components        = Component::all();
+        $materialMasters   = MaterialMaster::orderBy('material_code')->get(); // ✅ FIX UTAMA
+
+        return view('mso.edit', compact(
+            'mso',
+            'nomenclatures',
+            'plants',
+            'areas',
+            'maintenanceTypes',
+            'components',
+            'materialMasters'   // ✅ ini yang bikin 500 error kalau tidak ada
+        ));
     }
 
     public function update(Request $request, $id)
