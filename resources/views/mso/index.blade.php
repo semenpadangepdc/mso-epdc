@@ -655,6 +655,14 @@
                         <span>Tambah MSO</span>
                     </a>
 
+                    <!-- Tombol Export Excel -->
+                    <a href="{{ route('mso.export-excel', request()->query()) }}"
+                       class="btn-add"
+                       style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
+                        <span>📊</span>
+                        <span>Export Excel</span>
+                    </a>
+
                 </div>
 
             </div>

@@ -153,4 +153,19 @@ class ProductionCalendarController extends Controller
             ->route('production-calendar.index')
             ->with('success', 'Production Calendar berhasil diperbarui');
     }
+
+    public function destroy(string $id)
+    {
+        // Hanya Admin dan Supervisor
+        if (!auth()->user()->hasAnyRole(['Admin','Supervisor'])) {
+            abort(403, 'Unauthorized');
+        }
+
+        $calendar = ProductionCalendar::findOrFail($id);
+        $calendar->delete();
+
+        return redirect()
+            ->route('production-calendar.index')
+            ->with('success', 'Production Calendar berhasil dihapus');
+    }
 }

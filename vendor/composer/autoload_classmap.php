@@ -21,6 +21,7 @@ return array(
     'App\\Http\\Controllers\\Auth\\VerifyEmailController' => $baseDir . '/app/Http/Controllers/Auth/VerifyEmailController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
     'App\\Http\\Controllers\\DashboardController' => $baseDir . '/app/Http/Controllers/DashboardController.php',
+    'App\\Http\\Controllers\\MaterialMasterController' => $baseDir . '/app/Http/Controllers/MaterialMasterController.php',
     'App\\Http\\Controllers\\MaterialMonitoringController' => $baseDir . '/app/Http/Controllers/MaterialMonitoringController.php',
     'App\\Http\\Controllers\\MaterialRequestController' => $baseDir . '/app/Http/Controllers/MaterialRequestController.php',
     'App\\Http\\Controllers\\MsoTransactionController' => $baseDir . '/app/Http/Controllers/MsoTransactionController.php',

@@ -494,6 +494,129 @@ class MsoTransactionController extends Controller
         }
     }
 
+    public function exportExcel(Request $request)
+    {
+        // ====================================================================
+        // 1️⃣ Ambil data dengan filter yang sama seperti di index
+        // ====================================================================
+        $query = MsoFinding::with([
+            'transaction.user',
+            'transaction.plant',
+            'transaction.area',
+            'transaction.nomenclature',
+            'transaction.maintenanceType',
+            'component',
+            'materialMaster',
+            'photos'
+        ])->orderByDesc('created_at');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('temuan', 'like', "%$search%")
+                    ->orWhereHas('transaction', function ($t) use ($search) {
+                        $t->where('no_mso', 'like', "%$search%")
+                            ->orWhere('id_trans', 'like', "%$search%");
+                    })
+                    ->orWhereHas('component', function ($c) use ($search) {
+                        $c->where('name', 'like', "%$search%");
+                    })
+                    ->orWhereHas('transaction.area', function ($a) use ($search) {
+                        $a->where('name', 'like', "%$search%");
+                    });
+            });
+        }
+
+        if ($request->filled('plant')) {
+            $query->whereHas('transaction', function($q) use ($request) {
+                $q->where('plant_id', $request->plant);
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->whereHas('transaction', function($q) use ($request) {
+                $q->where('status_pekerjaan', $request->status);
+            });
+        }
+
+        $rows = $query->get();
+
+        // ====================================================================
+        // 2️⃣ Buat file Excel
+        // ====================================================================
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('MSO Data');
+
+        $headers = [
+            'ID Trans', 'Sub ID', 'User', 'Time Stamp', 'Plant', 'Area', 'Nomenclature',
+            'Deskripsi', 'Status Peralatan', 'Jenis Maintenance', 'Komponen', 'Temuan Abnormalitas',
+            'Material Master', 'Action', 'Status Pekerjaan', 'Start Date', 'Finish Date',
+            'Start Hour', 'Finish Hour', 'Total Duration (jam)', 'Foto Sebelum (URL)', 'Foto Sesudah (URL)',
+            'Keterangan', 'No MSO'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        $rowNum = 2;
+        foreach ($rows as $row) {
+            $beforeUrls = [];
+            $afterUrls = [];
+            foreach ($row->photos as $photo) {
+                if ($photo->type == 'before') {
+                    $beforeUrls[] = asset('storage/' . $photo->filename);
+                } elseif ($photo->type == 'after') {
+                    $afterUrls[] = asset('storage/' . $photo->filename);
+                }
+            }
+
+            $sheet->setCellValue('A' . $rowNum, $row->transaction->id_trans ?? '');
+            $sheet->setCellValue('B' . $rowNum, $row->sub_id ?? '');
+            $sheet->setCellValue('C' . $rowNum, $row->transaction->user->name ?? '');
+            $sheet->setCellValue('D' . $rowNum, $row->created_at ? $row->created_at->format('d/m/Y H:i') : '');
+            $sheet->setCellValue('E' . $rowNum, $row->transaction->plant->name ?? '');
+            $sheet->setCellValue('F' . $rowNum, $row->transaction->area->name ?? '');
+            $sheet->setCellValue('G' . $rowNum, $row->transaction->nomenclature->name ?? '');
+            $sheet->setCellValue('H' . $rowNum, $row->transaction->nomenclature->description ?? '');
+            $sheet->setCellValue('I' . $rowNum, $row->transaction->status_peralatan ?? '');
+            $sheet->setCellValue('J' . $rowNum, $row->transaction->maintenanceType->name ?? '');
+            $sheet->setCellValue('K' . $rowNum, $row->component->name ?? '');
+            $sheet->setCellValue('L' . $rowNum, $row->temuan ?? '');
+            $sheet->setCellValue('M' . $rowNum, $row->materialMaster->material_code ?? '');
+            $sheet->setCellValue('N' . $rowNum, $row->action ?? '');
+            $sheet->setCellValue('O' . $rowNum, $row->transaction->status_pekerjaan ?? '');
+            $sheet->setCellValue('P' . $rowNum, $row->transaction->start_date ? \Carbon\Carbon::parse($row->transaction->start_date)->format('Y-m-d') : '');
+            $sheet->setCellValue('Q' . $rowNum, $row->transaction->finish_date ? \Carbon\Carbon::parse($row->transaction->finish_date)->format('Y-m-d') : '');
+            $sheet->setCellValue('R' . $rowNum, $row->transaction->start_hour ?? '');
+            $sheet->setCellValue('S' . $rowNum, $row->transaction->finish_hour ?? '');
+            $sheet->setCellValue('T' . $rowNum, $row->transaction->total_duration ?? '');
+            $sheet->setCellValue('U' . $rowNum, implode(', ', $beforeUrls));
+            $sheet->setCellValue('V' . $rowNum, implode(', ', $afterUrls));
+            $sheet->setCellValue('W' . $rowNum, $row->transaction->keterangan ?? '');
+            $sheet->setCellValue('X' . $rowNum, $row->transaction->no_mso ?? '');
+            $rowNum++;
+        }
+
+        foreach (range('A', 'X') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // ====================================================================
+        // 3️⃣ Download file
+        // ====================================================================
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = 'MSO_Export_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $writer->save('php://output');
+        exit;
+    }
+
     public function updateTime(Request $request, MsoTransaction $mso)
     {
         // 🔐 AUTHORIZATION: Hanya Supervisor yang bisa update

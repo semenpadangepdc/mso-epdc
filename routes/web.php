@@ -20,6 +20,7 @@ require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/mso/export-excel', [MsoTransactionController::class, 'exportExcel'])->name('mso.export-excel');
     Route::resource('mso', MsoTransactionController::class);
     Route::get('/mso/{id}/export-pdf', [MsoTransactionController::class, 'exportPdf'])
         ->name('mso.export.pdf');

@@ -796,6 +796,7 @@ class ComposerStaticInit9c491b8531eec05ba41a11d9276a5749
         'App\\Http\\Controllers\\Auth\\VerifyEmailController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/VerifyEmailController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
+        'App\\Http\\Controllers\\MaterialMasterController' => __DIR__ . '/../..' . '/app/Http/Controllers/MaterialMasterController.php',
         'App\\Http\\Controllers\\MaterialMonitoringController' => __DIR__ . '/../..' . '/app/Http/Controllers/MaterialMonitoringController.php',
         'App\\Http\\Controllers\\MaterialRequestController' => __DIR__ . '/../..' . '/app/Http/Controllers/MaterialRequestController.php',
         'App\\Http\\Controllers\\MsoTransactionController' => __DIR__ . '/../..' . '/app/Http/Controllers/MsoTransactionController.php',

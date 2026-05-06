@@ -7,12 +7,12 @@
             
             <h2 class="text-xl font-bold mb-4">Production Calendar</h2>
 
-            @canany(['Admin', 'Supervisor'])
+            @if(auth()->user()->hasAnyRole(['Admin','Supervisor']))
                 <a href="{{ route('production-calendar.create') }}"
                    class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150 mb-3">
                     + Tambah Kalender
                 </a>
-            @endcanany
+            @endif
 
             @if($calendars->isEmpty())
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
@@ -53,9 +53,11 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     DT Plan
                                 </th>
+                                @if(auth()->user()->hasAnyRole(['Admin','Supervisor']))
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Aksi
                                 </th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -79,17 +81,28 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {{ $c->planned_downtime_hours }}
                                 </td>
+                                @if(auth()->user()->hasAnyRole(['Admin','Supervisor']))
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    @canany(['Admin', 'Supervisor'])
-                                        <a href="{{ route('production-calendar.edit',$c) }}" 
-                                           class="text-indigo-600 hover:text-indigo-900"
-                                           title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                    @else
-                                        <span class="text-gray-400">-</span>
-                                    @endcanany
+                                    <a href="{{ route('production-calendar.edit', $c->id) }}" 
+                                       class="text-indigo-600 hover:text-indigo-900 mr-3"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <button type="button"
+                                            onclick="confirmDelete({{ $c->id }})"
+                                            class="text-red-600 hover:text-red-900"
+                                            title="Hapus">
+                                        <i class="fas fa-trash-alt"></i> Hapus
+                                    </button>
+
+                                    <form id="delete-form-{{ $c->id }}" 
+                                          action="{{ route('production-calendar.destroy', $c->id) }}" 
+                                          method="POST" style="display: none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
                                 </td>
+                                @endif
                             </tr>
                             @endforeach
                         </tbody>
@@ -104,4 +117,13 @@
         </div>
     </div>
 </div>
+
+<script>
+function confirmDelete(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+        document.getElementById('delete-form-' + id).submit();
+    }
+}
+</script>
+
 @endsection

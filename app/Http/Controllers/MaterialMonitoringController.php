@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\MaterialMonitoring;
 use App\Models\MsoTransaction;
+use App\Models\MsoFinding;
 use Carbon\Carbon;
 
 class MaterialMonitoringController extends Controller
@@ -376,5 +377,55 @@ class MaterialMonitoringController extends Controller
         return redirect()
             ->route('monitoring.detail', ['trans_id' => $monitoring->trans_id])
             ->with('success', 'Data monitoring berhasil diperbarui.');
+    }
+
+    /**
+     * Export data dari MsoTransaction & MsoFinding ke tabel material_monitorings.
+     */
+    public function export($trans_id)
+    {
+        // 1. Cek apakah transaksi MSO dengan id_trans ini ada
+        $transaction = MsoTransaction::where('id_trans', $trans_id)->first();
+        if (!$transaction) {
+            return redirect()->route('monitoring.index')
+                ->with('error', 'Transaksi MSO tidak ditemukan.');
+        }
+
+        // 2. Cegah duplikasi: jika sudah ada data monitoring untuk trans_id ini,
+        //    langsung redirect ke halaman detail.
+        $exists = MaterialMonitoring::where('trans_id', $trans_id)->exists();
+        if ($exists) {
+            return redirect()->route('monitoring.detail', $trans_id)
+                ->with('info', 'Data monitoring untuk transaksi ini sudah ada.');
+        }
+
+        // 3. Ambil semua finding dari MSO transaction ini
+        $findings = MsoFinding::with(['transaction.nomenclature', 'component', 'materialMaster'])
+            ->where('mso_transaction_id', $transaction->id)
+            ->get();
+
+        if ($findings->isEmpty()) {
+            return redirect()->route('monitoring.index')
+                ->with('error', 'Tidak ada finding untuk transaksi ini.');
+        }
+
+        // 4. Simpan setiap finding ke tabel material_monitorings
+        foreach ($findings as $finding) {
+            MaterialMonitoring::create([
+                'trans_id'        => $trans_id,
+                'nomenclature'    => $finding->transaction->nomenclature->name ?? null,
+                'component'       => $finding->component->name ?? null,
+                'abnormality'     => $finding->temuan,
+                'action'          => $finding->action,
+                'material_master' => $finding->materialMaster->material_code ?? null,
+                // Kolom lain diisi default NULL (bisa diisi kemudian di halaman detail)
+                'tanggal'         => now(),
+                'status'          => 'Open',
+            ]);
+        }
+
+        // 5. Redirect ke halaman detail monitoring
+        return redirect()->route('monitoring.detail', $trans_id)
+            ->with('success', 'Data monitoring berhasil di-export dari MSO.');
     }
 }
