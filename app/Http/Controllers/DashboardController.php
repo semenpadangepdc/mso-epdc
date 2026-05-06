@@ -42,25 +42,37 @@ class DashboardController extends Controller
         $mainDashboard   = $this->dashboardService->getDashboardData($filters);
         $reliabilityData = $mainDashboard['availability'] ?? [];
 
-        // Ambil nama area sekali untuk di-map ke semua data
-        $areaNames = Area::pluck('name', 'id');
+        // Load all areas with their plant relationship
+        $areas = Area::with('plant')->get();
 
-        // Siapkan $availability untuk blade (per area, dengan key 'area' = nama area)
+        // Build composite name: area name + plant number (e.g., "Finish Mill 4")
+        $areaCompositeNameMap = [];
+        foreach ($areas as $area) {
+            $plantName   = $area->plant->name ?? '';
+            // Extract numeric suffix from plant name (Indarung 4 -> 4, Indarung 23 -> 23)
+            preg_match('/\d+$/', $plantName, $matches);
+            $plantNumber = $matches[0] ?? '';
+            $areaName    = $area->name;
+            $composite   = $plantNumber ? "{$areaName} {$plantNumber}" : $areaName;
+            $areaCompositeNameMap[$area->id] = $composite;
+        }
+
+        // Siapkan $availability untuk blade (per area, dengan key 'area' = nama area + plant number)
         $availabilityArea = collect($reliabilityData['availability_area'] ?? [])
             ->map(fn($item) => array_merge($item, [
-                'area' => $areaNames[$item['area_id']] ?? 'Area ' . $item['area_id'],
+                'area' => $areaCompositeNameMap[$item['area_id']] ?? 'Area ' . $item['area_id'],
             ]));
 
         // Siapkan $availability_unit untuk blade (per unit, dengan area name)
         $availabilityUnit = collect($reliabilityData['availability_unit'] ?? [])
             ->map(fn($item) => array_merge($item, [
-                'area' => $areaNames[$item['area_id']] ?? 'Area ' . $item['area_id'],
+                'area' => $areaCompositeNameMap[$item['area_id']] ?? 'Area ' . $item['area_id'],
             ]));
 
         // Frequency per area & unit
         $downtimeFreqArea = collect($reliabilityData['downtime_frequency_area'] ?? [])
             ->map(fn($item) => array_merge($item, [
-                'area' => $areaNames[$item['area_id']] ?? 'Area ' . $item['area_id'],
+                'area' => $areaCompositeNameMap[$item['area_id']] ?? 'Area ' . $item['area_id'],
             ]));
 
         $downtimeFreqUnit = collect($reliabilityData['downtime_frequency_unit'] ?? []);
