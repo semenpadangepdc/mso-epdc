@@ -123,7 +123,6 @@ class ReliabilityService
     */
     private function getAvailabilityUnit(array $filters)
     {
-        // Downtime per nomenclature
         $downtimePerUnit = $this->downtimeBaseQuery($filters)
             ->select(
                 'mso_transactions.nomenclature_id',
@@ -132,30 +131,15 @@ class ReliabilityService
                 DB::raw('SUM(mso_transactions.total_duration) as total_downtime'),
                 DB::raw('COUNT(*) as frequency')
             )
-            ->groupBy(
-                'mso_transactions.nomenclature_id',
-                'nomenclatures.name',
-                'nomenclatures.area_id'
-            )
+            ->groupBy('mso_transactions.nomenclature_id', 'nomenclatures.name', 'nomenclatures.area_id')
             ->get();
 
-        // Planned hours per area
         $plannedPerArea = $this->getPlannedHours($filters, 'area_id');
 
-        // Jumlah unit per area (untuk membagi planned hours secara proporsional)
-        $unitCountPerArea = Nomenclature::query()
-            ->whereIn('type', $this->mainFilterTypes)
-            ->select('area_id', DB::raw('COUNT(*) as unit_count'))
-            ->groupBy('area_id')
-            ->pluck('unit_count', 'area_id');
-
-        return $downtimePerUnit->map(function ($item) use ($plannedPerArea, $unitCountPerArea) {
-            $areaPlanned = $plannedPerArea[$item->area_id] ?? 0;
-            $unitCount   = $unitCountPerArea[$item->area_id] ?? 1;
-
-            // Planned per unit = planned area dibagi jumlah unit di area
-            $plannedUnit = $unitCount > 0 ? ($areaPlanned / $unitCount) : 0;
-            $downtime    = $item->total_downtime ?? 0;
+        return $downtimePerUnit->map(function ($item) use ($plannedPerArea) {
+            // TIDAK dibagi unit count — setiap unit punya planned hours yang sama dengan area
+            $plannedUnit = $plannedPerArea[$item->area_id] ?? 0;
+            $downtime = $item->total_downtime ?? 0;
 
             $availability = $plannedUnit > 0
                 ? round((($plannedUnit - $downtime) / $plannedUnit) * 100, 2)
@@ -163,12 +147,12 @@ class ReliabilityService
 
             return [
                 'nomenclature_id' => $item->nomenclature_id,
-                'unit_name'       => $item->unit_name,
-                'area_id'         => $item->area_id,
-                'planned_hours'   => round($plannedUnit, 2),
-                'downtime_hours'  => round($downtime, 2),
-                'frequency'       => $item->frequency,
-                'availability'    => $availability,
+                'unit_name' => $item->unit_name,
+                'area_id' => $item->area_id,
+                'planned_hours' => round($plannedUnit, 2),
+                'downtime_hours' => round($downtime, 2),
+                'frequency' => $item->frequency,
+                'availability' => $availability,
             ];
         })->sortBy('unit_name')->values();
     }

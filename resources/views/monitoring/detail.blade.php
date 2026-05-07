@@ -489,6 +489,11 @@
         </div>
         <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
             <span class="trans-badge">ID Trans: {{ $trans_id }}</span>
+            <a href="{{ route('monitoring.export-detail', $trans_id) }}"
+               class="btn-back"
+               style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); border: none;">
+                📊 Export Excel
+            </a>
             <a href="{{ route('monitoring.index') }}" class="btn-back">
                 ← Kembali
             </a>

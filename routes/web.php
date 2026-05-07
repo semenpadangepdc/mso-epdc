@@ -121,6 +121,14 @@ Route::middleware('auth')->prefix('monitoring-material')->name('monitoring.')->g
     Route::post('/store', [MaterialMonitoringController::class, 'store'])
         ->name('store');
 
+    // Export Excel semua data (dengan filter)
+    Route::get('/export-excel', [MaterialMonitoringController::class, 'exportExcel'])
+        ->name('export-excel');
+
+    // Export Excel detail per ID Trans
+    Route::get('/detail-export/{trans_id}', [MaterialMonitoringController::class, 'exportDetailExcel'])
+        ->name('export-detail');
+
     // Update baris dari modal edit (PUT /monitoring-material/{monitoring})
     Route::put('/{monitoring}', [MaterialMonitoringController::class, 'update'])
         ->name('update');

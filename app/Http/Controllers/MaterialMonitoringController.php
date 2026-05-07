@@ -21,6 +21,10 @@ class MaterialMonitoringController extends Controller
             $query->where('material_master', 'like', '%' . $request->material_master . '%');
         }
 
+        if ($request->filled('nomenclature')) {
+            $query->where('nomenclature', 'like', '%' . $request->nomenclature . '%');
+        }
+
         $data  = $query->orderBy('trans_id')->get();
         $total = $data->sum('estimasi_harga');
 
@@ -427,5 +431,151 @@ class MaterialMonitoringController extends Controller
         // 5. Redirect ke halaman detail monitoring
         return redirect()->route('monitoring.detail', $trans_id)
             ->with('success', 'Data monitoring berhasil di-export dari MSO.');
+    }
+
+    /**
+     * Export data monitoring ke Excel (semua data atau berdasarkan filter)
+     */
+    public function exportExcel(Request $request)
+    {
+        $query = MaterialMonitoring::query();
+
+        if ($request->filled('material_master')) {
+            $query->where('material_master', 'like', '%' . $request->material_master . '%');
+        }
+
+        if ($request->filled('nomenclature')) {
+            $query->where('nomenclature', 'like', '%' . $request->nomenclature . '%');
+        }
+
+        $data = $query->orderBy('trans_id')->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Monitoring Material');
+
+        $headers = [
+            'ID Trans', 'Nomenclature', 'Komponen', 'Temuan/Abnormality', 'Action',
+            'Material Master', 'Tanggal', 'No. Notifikasi', 'Qty', 'UoM',
+            'Pengadaan', 'Model', 'No. Reservasi', 'Tgl. Reservasi', 'No. PR',
+            'Tgl. PR', 'No. PO', 'Tgl. PO', 'Est. Delivery', 'Estimasi Harga',
+            'Nama Vendor', 'Status'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        $rowNum = 2;
+        foreach ($data as $row) {
+            $sheet->setCellValue('A' . $rowNum, $row->trans_id);
+            $sheet->setCellValue('B' . $rowNum, $row->nomenclature ?? '');
+            $sheet->setCellValue('C' . $rowNum, $row->component ?? '');
+            $sheet->setCellValue('D' . $rowNum, $row->abnormality ?? '');
+            $sheet->setCellValue('E' . $rowNum, $row->action ?? '');
+            $sheet->setCellValue('F' . $rowNum, $row->material_master ?? '');
+            $sheet->setCellValue('G' . $rowNum, $row->tanggal ? Carbon::parse($row->tanggal)->format('d/m/Y') : '');
+            $sheet->setCellValue('H' . $rowNum, $row->no_notifikasi ?? '');
+            $sheet->setCellValue('I' . $rowNum, $row->qty);
+            $sheet->setCellValue('J' . $rowNum, $row->uom ?? '');
+            $sheet->setCellValue('K' . $rowNum, $row->pengadaan ?? '');
+            $sheet->setCellValue('L' . $rowNum, $row->model ?? '');
+            $sheet->setCellValue('M' . $rowNum, $row->nomor_reservasi ?? '');
+            $sheet->setCellValue('N' . $rowNum, $row->tanggal_reservasi ? Carbon::parse($row->tanggal_reservasi)->format('d/m/Y') : '');
+            $sheet->setCellValue('O' . $rowNum, $row->nomor_pr ?? '');
+            $sheet->setCellValue('P' . $rowNum, $row->tanggal_pr ? Carbon::parse($row->tanggal_pr)->format('d/m/Y') : '');
+            $sheet->setCellValue('Q' . $rowNum, $row->nomor_po ?? '');
+            $sheet->setCellValue('R' . $rowNum, $row->tanggal_po ? Carbon::parse($row->tanggal_po)->format('d/m/Y') : '');
+            $sheet->setCellValue('S' . $rowNum, $row->estimated_delivery ? Carbon::parse($row->estimated_delivery)->format('d/m/Y') : '');
+            $sheet->setCellValue('T' . $rowNum, $row->estimasi_harga);
+            $sheet->setCellValue('U' . $rowNum, $row->nama_vendor ?? '');
+            $sheet->setCellValue('V' . $rowNum, $row->status ?? '');
+            $rowNum++;
+        }
+
+        foreach (range('A', 'V') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = 'Monitoring_Material_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $writer->save('php://output');
+        exit;
+    }
+
+    /**
+     * Export detail monitoring per ID Trans ke Excel
+     */
+    public function exportDetailExcel($trans_id)
+    {
+        $data = MaterialMonitoring::where('trans_id', $trans_id)
+            ->orderBy('created_at')
+            ->get();
+
+        if ($data->isEmpty()) {
+            return redirect()->route('monitoring.detail', $trans_id)
+                ->with('error', 'Tidak ada data untuk diekspor.');
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Detail Monitoring ' . $trans_id);
+
+        $headers = [
+            'ID Trans', 'Nomenclature', 'Komponen', 'Temuan', 'Action', 'Material Master',
+            'Tanggal', 'No. Notifikasi', 'Qty', 'UoM', 'Pengadaan', 'Model',
+            'No. Reservasi', 'Tgl. Reservasi', 'No. PR', 'Tgl. PR', 'No. PO',
+            'Tgl. PO', 'Est. Delivery', 'Estimasi Harga', 'Nama Vendor', 'Status'
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+
+        $rowNum = 2;
+        foreach ($data as $row) {
+            $sheet->setCellValue('A' . $rowNum, $row->trans_id);
+            $sheet->setCellValue('B' . $rowNum, $row->nomenclature ?? '');
+            $sheet->setCellValue('C' . $rowNum, $row->component ?? '');
+            $sheet->setCellValue('D' . $rowNum, $row->abnormality ?? '');
+            $sheet->setCellValue('E' . $rowNum, $row->action ?? '');
+            $sheet->setCellValue('F' . $rowNum, $row->material_master ?? '');
+            $sheet->setCellValue('G' . $rowNum, $row->tanggal ? Carbon::parse($row->tanggal)->format('d/m/Y') : '');
+            $sheet->setCellValue('H' . $rowNum, $row->no_notifikasi ?? '');
+            $sheet->setCellValue('I' . $rowNum, $row->qty);
+            $sheet->setCellValue('J' . $rowNum, $row->uom ?? '');
+            $sheet->setCellValue('K' . $rowNum, $row->pengadaan ?? '');
+            $sheet->setCellValue('L' . $rowNum, $row->model ?? '');
+            $sheet->setCellValue('M' . $rowNum, $row->nomor_reservasi ?? '');
+            $sheet->setCellValue('N' . $rowNum, $row->tanggal_reservasi ? Carbon::parse($row->tanggal_reservasi)->format('d/m/Y') : '');
+            $sheet->setCellValue('O' . $rowNum, $row->nomor_pr ?? '');
+            $sheet->setCellValue('P' . $rowNum, $row->tanggal_pr ? Carbon::parse($row->tanggal_pr)->format('d/m/Y') : '');
+            $sheet->setCellValue('Q' . $rowNum, $row->nomor_po ?? '');
+            $sheet->setCellValue('R' . $rowNum, $row->tanggal_po ? Carbon::parse($row->tanggal_po)->format('d/m/Y') : '');
+            $sheet->setCellValue('S' . $rowNum, $row->estimated_delivery ? Carbon::parse($row->estimated_delivery)->format('d/m/Y') : '');
+            $sheet->setCellValue('T' . $rowNum, $row->estimasi_harga);
+            $sheet->setCellValue('U' . $rowNum, $row->nama_vendor ?? '');
+            $sheet->setCellValue('V' . $rowNum, $row->status ?? '');
+            $rowNum++;
+        }
+
+        foreach (range('A', 'V') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = 'Detail_Monitoring_' . $trans_id . '_' . date('Ymd_His') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        $writer->save('php://output');
+        exit;
     }
 }

@@ -355,17 +355,31 @@
                        value="{{ request('material_master') }}">
             </div>
             <div>
+                <label class="filter-label">🔍 Cari Nomenclature</label>
+                <input name="nomenclature"
+                       class="search-input"
+                       placeholder="Ketik Nomenclature..."
+                       value="{{ request('nomenclature') }}">
+            </div>
+            <div>
                 <button type="submit" class="btn-search">
                     🔎 Filter
                 </button>
             </div>
-            @if(request('material_master'))
+            @if(request('material_master') || request('nomenclature'))
             <div>
                 <a href="{{ route('monitoring.index') }}" class="btn-reset">
                     ✖ Reset
                 </a>
             </div>
             @endif
+            <div style="margin-left: auto;">
+                <a href="{{ route('monitoring.export-excel', request()->query()) }}"
+                   class="btn-detail"
+                   style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
+                    📊 Export Excel
+                </a>
+            </div>
         </form>
     </div>
 
