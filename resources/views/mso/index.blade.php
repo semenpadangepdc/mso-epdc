@@ -953,7 +953,7 @@
                             </a>
 
                             {{-- Delete Button (Supervisor only) --}}
-                            @if(auth()->user()->hasRole('Supervisor'))
+                            @if(auth()->user()->hasRole('Admin'))
                                 @php
                                     $totalFindings = $row->transaction->findings->count();
                                     $isLastFinding = $totalFindings <= 1;
