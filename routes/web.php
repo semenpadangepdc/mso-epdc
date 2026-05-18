@@ -12,7 +12,7 @@ use App\Http\Controllers\NomenclatureController;
 use App\Http\Controllers\MaterialRequestController;
 use App\Http\Controllers\MaterialMonitoringController;
 use App\Http\Controllers\MaterialMasterController;
-
+use App\Http\Controllers\Admin\UserController;   // ← TAMBAHAN
 
 Route::get('/', fn () => redirect()->route('mso.index'));
 
@@ -101,35 +101,27 @@ Route::get('/nomenclatures', [NomenclatureController::class, 'index'])
 // ===============================
 Route::middleware('auth')->prefix('monitoring-material')->name('monitoring.')->group(function () {
 
-    // Halaman utama: daftar semua data + filter material_master
     Route::get('/', [MaterialMonitoringController::class, 'index'])
         ->name('index');
 
-    // 📊 Resume / Analitik: rata-rata durasi Open→Closed per pengadaan
     Route::get('/resume', [MaterialMonitoringController::class, 'resume'])
         ->name('resume');
 
-    // Export: ambil data MsoFinding → simpan ke material_monitorings → redirect ke detail
     Route::get('/export/{trans_id}', [MaterialMonitoringController::class, 'export'])
         ->name('export');
 
-    // Layar detail per ID Trans: tabel + form insert baris baru
     Route::get('/detail/{trans_id}', [MaterialMonitoringController::class, 'detail'])
         ->name('detail');
 
-    // Simpan baris baru dari form di layar detail
     Route::post('/store', [MaterialMonitoringController::class, 'store'])
         ->name('store');
 
-    // Export Excel semua data (dengan filter)
     Route::get('/export-excel', [MaterialMonitoringController::class, 'exportExcel'])
         ->name('export-excel');
 
-    // Export Excel detail per ID Trans
     Route::get('/detail-export/{trans_id}', [MaterialMonitoringController::class, 'exportDetailExcel'])
         ->name('export-detail');
 
-    // Update baris dari modal edit (PUT /monitoring-material/{monitoring})
     Route::put('/{monitoring}', [MaterialMonitoringController::class, 'update'])
         ->name('update');
 });
@@ -147,4 +139,14 @@ Route::middleware(['auth', 'role:Admin'])
         Route::get('/{materialMaster}/edit',   [MaterialMasterController::class, 'edit'])->name('edit');
         Route::put('/{materialMaster}',        [MaterialMasterController::class, 'update'])->name('update');
         Route::delete('/{materialMaster}',     [MaterialMasterController::class, 'destroy'])->name('destroy');
+    });
+
+// ===============================
+// 🔐 ADMIN USER MANAGEMENT (ADMIN ONLY)
+// ===============================
+Route::middleware(['auth', 'role:Admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('users', UserController::class);
     });

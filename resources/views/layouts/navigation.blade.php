@@ -69,7 +69,7 @@
     }
 
     /* ============================================================
-    DROPDOWN MENU (untuk grup "Monitoring")
+    DROPDOWN MENU
     ============================================================ */
 
     .nav-dropdown-wrapper {
@@ -188,7 +188,7 @@
     }
 
     /* ============================================================
-    RESPONSIVE: Monitoring sub-menu (mobile accordion)
+    RESPONSIVE: sub-menu (mobile accordion)
     ============================================================ */
     .responsive-sub-menu {
         display: none;
@@ -354,7 +354,6 @@
 
                         <div class="nav-dropdown-panel">
 
-                            {{-- ── Grup: Material & Jasa ── --}}
                             <div class="nav-dropdown-group-label">Material &amp; Jasa</div>
 
                             <a href="{{ route('monitoring.index') }}"
@@ -372,7 +371,6 @@
 
                             <hr class="nav-dropdown-divider">
 
-                            {{-- ── Grup: Lainnya ── --}}
                             <div class="nav-dropdown-group-label">Lainnya</div>
 
                             <a href="{{ route('nomenclatures.index') }}"
@@ -386,16 +384,45 @@
                     <!-- END MONITORING DROPDOWN -->
 
                     <!-- ==========================================
-                         MATERIAL MASTER — Admin only (Desktop)
+                         ADMIN (Dropdown) — hanya tampil untuk role Admin
+                         Material Master + Manajemen User digabung
                          ========================================== -->
                     @role('Admin')
-                    <a href="{{ route('material-master.index') }}"
-                       class="nav-link-custom {{ request()->routeIs('material-master.*') ? 'active' : '' }}">
-                        <i class="fas fa-database"></i>
-                        Material Master
-                        <span class="nav-badge-admin">Admin</span>
-                    </a>
+                    <div class="nav-dropdown-wrapper {{ request()->routeIs('material-master.*') || request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                         id="adminDropdown">
+                        <button type="button"
+                                class="nav-dropdown-trigger {{ request()->routeIs('material-master.*') || request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                                onclick="toggleDropdown('adminDropdown')">
+                            <i class="fas fa-shield-alt"></i>
+                            Admin
+                            <span class="nav-badge-admin">Admin</span>
+                            <i class="fas fa-chevron-down chevron"></i>
+                        </button>
+
+                        <div class="nav-dropdown-panel">
+
+                            <div class="nav-dropdown-group-label">Master Data</div>
+
+                            <a href="{{ route('material-master.index') }}"
+                               class="nav-dropdown-item {{ request()->routeIs('material-master.*') ? 'active' : '' }}">
+                                <i class="fas fa-database"></i>
+                                Material Master
+                            </a>
+
+                            <hr class="nav-dropdown-divider">
+
+                            <div class="nav-dropdown-group-label">Pengguna</div>
+
+                            <a href="{{ route('admin.users.index') }}"
+                               class="nav-dropdown-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                                <i class="fas fa-users-cog"></i>
+                                Manajemen User
+                            </a>
+
+                        </div>
+                    </div>
                     @endrole
+                    <!-- END ADMIN DROPDOWN -->
 
                 </div>
             </div>
@@ -517,16 +544,42 @@
             <!-- END MONITORING MOBILE -->
 
             <!-- ==========================================
-                 MATERIAL MASTER — Admin only (Mobile)
+                 ADMIN (Mobile Accordion) — hanya untuk role Admin
+                 Material Master + Manajemen User digabung
                  ========================================== -->
             @role('Admin')
-            <a href="{{ route('material-master.index') }}"
-               class="responsive-nav-link-custom {{ request()->routeIs('material-master.*') ? 'active' : '' }}">
-                <i class="fas fa-database"></i>
-                Material Master
-                <span class="nav-badge-admin" style="margin-left:0.5rem;">Admin</span>
-            </a>
+            <div id="mobileAdminWrapper">
+                <button type="button"
+                        id="mobileAdminTrigger"
+                        class="responsive-sub-menu-trigger {{ request()->routeIs('material-master.*') || request()->routeIs('admin.users.*') ? 'active' : '' }}"
+                        onclick="toggleMobileSubMenu('mobileAdminMenu', 'mobileAdminTrigger')">
+                    <span style="display:flex; align-items:center; gap:0.75rem;">
+                        <i class="fas fa-shield-alt" style="font-size:1.125rem;"></i>
+                        Admin
+                        <span class="nav-badge-admin">Admin</span>
+                    </span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </button>
+
+                <div id="mobileAdminMenu"
+                     class="responsive-sub-menu {{ request()->routeIs('material-master.*') || request()->routeIs('admin.users.*') ? 'open' : '' }}">
+
+                    <a href="{{ route('material-master.index') }}"
+                       class="responsive-sub-item {{ request()->routeIs('material-master.*') ? 'active' : '' }}">
+                        <i class="fas fa-database"></i>
+                        Material Master
+                    </a>
+
+                    <a href="{{ route('admin.users.index') }}"
+                       class="responsive-sub-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <i class="fas fa-users-cog"></i>
+                        Manajemen User
+                    </a>
+
+                </div>
+            </div>
             @endrole
+            <!-- END ADMIN MOBILE -->
 
         </div>
 
@@ -559,13 +612,18 @@
 <script>
     // ============================================================
     // DROPDOWN TOGGLE (desktop)
+    // Menutup dropdown lain saat satu dibuka
     // ============================================================
     function toggleDropdown(wrapperId) {
-        const wrapper = document.getElementById(wrapperId);
-        wrapper.classList.toggle('open');
+        document.querySelectorAll('.nav-dropdown-wrapper').forEach(function (wrapper) {
+            if (wrapper.id !== wrapperId) {
+                wrapper.classList.remove('open');
+            }
+        });
+        document.getElementById(wrapperId).classList.toggle('open');
     }
 
-    // Tutup dropdown jika klik di luar
+    // Tutup semua dropdown jika klik di luar
     document.addEventListener('click', function (e) {
         document.querySelectorAll('.nav-dropdown-wrapper').forEach(function (wrapper) {
             if (!wrapper.contains(e.target)) {
