@@ -811,10 +811,10 @@
                             @if($beforePhotos->count())
                                 <div class="photo-thumb-container">
                                     @foreach($beforePhotos as $photo)
-                                        @if($photo->path)
+                                        @if($photo->filename)
                                         <div class="photo-thumb-wrap">
-                                            <img src="{{ Storage::disk('image')->url($photo->path) }}"
-                                                 onclick="openPreview('{{ Storage::disk('image')->url($photo->path) }}')"
+                                            <img src="{{ Storage::disk('image')->url(ltrim($photo->filename, '/')) }}"
+                                                 onclick="openPreview('{{ Storage::disk('image')->url(ltrim($photo->filename, '/')) }}')"
                                                  alt="Before">
                                         </div>
                                         @endif
@@ -831,10 +831,10 @@
                             @if($afterPhotos->count())
                                 <div class="photo-thumb-container">
                                     @foreach($afterPhotos as $photo)
-                                        @if($photo->path)
+                                        @if($photo->filename)
                                         <div class="photo-thumb-wrap">
-                                            <img src="{{ Storage::disk('image')->url($photo->path) }}"
-                                                 onclick="openPreview('{{ Storage::disk('image')->url($photo->path) }}')"
+                                            <img src="{{ Storage::disk('image')->url(ltrim($photo->filename, '/')) }}"
+                                                 onclick="openPreview('{{ Storage::disk('image')->url(ltrim($photo->filename, '/')) }}')"
                                                  alt="After">
                                         </div>
                                         @endif
