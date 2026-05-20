@@ -288,11 +288,8 @@ class MsoTransactionController extends Controller
             $subCounter = 1;
 
             foreach ($request->component_id as $i => $componentId) {
-                if (
-                    !$componentId &&
-                    empty($request->temuan[$i]) &&
-                    empty($request->action[$i])
-                ) {
+                // Skip row jika component_id kosong (NOT NULL constraint di DB)
+                if (!$componentId) {
                     continue;
                 }
 
@@ -567,9 +564,9 @@ class MsoTransactionController extends Controller
             $beforeUrls = [];
             $afterUrls = [];
             foreach ($row->photos as $photo) {
-                if ($photo->type == 'before') {
+                if ($photo->type == 'before' && $photo->filename) {
                     $beforeUrls[] = Storage::disk('image')->url($photo->filename);
-                } elseif ($photo->type == 'after') {
+                } elseif ($photo->type == 'after' && $photo->filename) {
                     $afterUrls[] = Storage::disk('image')->url($photo->filename);
                 }
             }

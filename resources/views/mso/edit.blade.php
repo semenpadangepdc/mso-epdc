@@ -811,11 +811,13 @@
                             @if($beforePhotos->count())
                                 <div class="photo-thumb-container">
                                     @foreach($beforePhotos as $photo)
+                                        @if($photo->path)
                                         <div class="photo-thumb-wrap">
                                             <img src="{{ Storage::disk('image')->url($photo->path) }}"
                                                  onclick="openPreview('{{ Storage::disk('image')->url($photo->path) }}')"
                                                  alt="Before">
                                         </div>
+                                        @endif
                                     @endforeach
                                 </div>
                             @else
@@ -829,11 +831,13 @@
                             @if($afterPhotos->count())
                                 <div class="photo-thumb-container">
                                     @foreach($afterPhotos as $photo)
+                                        @if($photo->path)
                                         <div class="photo-thumb-wrap">
                                             <img src="{{ Storage::disk('image')->url($photo->path) }}"
                                                  onclick="openPreview('{{ Storage::disk('image')->url($photo->path) }}')"
                                                  alt="After">
                                         </div>
+                                        @endif
                                     @endforeach
                                 </div>
                             @else

@@ -917,7 +917,7 @@
                     {{-- FOTO BEFORE --}}
                     <td>
                         @foreach($row->transaction->photos as $p)
-                            @if($p->type == 'before')
+                            @if($p->type == 'before' && $p->path)
                                 <img src="{{ Storage::disk('image')->url($p->path) }}" class="table-image" alt="Before">
                             @endif
                         @endforeach
@@ -926,7 +926,7 @@
                     {{-- FOTO AFTER --}}
                     <td>
                         @foreach($row->transaction->photos as $p)
-                            @if($p->type == 'after')
+                            @if($p->type == 'after' && $p->path)
                                 <img src="{{ Storage::disk('image')->url($p->path) }}" class="table-image" alt="After">
                             @endif
                         @endforeach

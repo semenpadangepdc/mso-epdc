@@ -101,9 +101,11 @@
             <h4 class="font-semibold mb-2">📷 Foto Sebelum</h4>
             <div class="grid grid-cols-2 gap-2">
                 @forelse($mso->photos->where('type','before') as $photo)
-                    <img src="{{ Storage::disk('image')->url($photo->path) }}"
-                         class="border rounded-lg shadow w-full h-32 object-cover cursor-pointer"
-                         onclick="previewImage('{{ Storage::disk('image')->url($photo->path) }}')">
+                    @if($photo->path)
+                        <img src="{{ Storage::disk('image')->url($photo->path) }}"
+                             class="border rounded-lg shadow w-full h-32 object-cover cursor-pointer"
+                             onclick="previewImage('{{ Storage::disk('image')->url($photo->path) }}')">
+                    @endif
                 @empty
                     <p class="text-gray-500">Tidak ada foto.</p>
                 @endforelse
@@ -115,9 +117,11 @@
             <h4 class="font-semibold mb-2">📷 Foto Sesudah</h4>
             <div class="grid grid-cols-2 gap-2">
                 @forelse($mso->photos->where('type','after') as $photo)
-                    <img src="{{ Storage::disk('image')->url($photo->path) }}"
-                         class="border rounded-lg shadow w-full h-32 object-cover cursor-pointer"
-                         onclick="previewImage('{{ Storage::disk('image')->url($photo->path) }}')">
+                    @if($photo->path)
+                        <img src="{{ Storage::disk('image')->url($photo->path) }}"
+                             class="border rounded-lg shadow w-full h-32 object-cover cursor-pointer"
+                             onclick="previewImage('{{ Storage::disk('image')->url($photo->path) }}')">
+                    @endif
                 @empty
                     <p class="text-gray-500">Tidak ada foto.</p>
                 @endforelse
