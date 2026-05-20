@@ -812,8 +812,8 @@
                                 <div class="photo-thumb-container">
                                     @foreach($beforePhotos as $photo)
                                         <div class="photo-thumb-wrap">
-                                            <img src="{{ asset('storage/' . $photo->path) }}"
-                                                 onclick="openPreview('{{ asset('storage/' . $photo->path) }}')"
+                                            <img src="{{ Storage::disk('image')->url($photo->path) }}"
+                                                 onclick="openPreview('{{ Storage::disk('image')->url($photo->path) }}')"
                                                  alt="Before">
                                         </div>
                                     @endforeach
@@ -830,8 +830,8 @@
                                 <div class="photo-thumb-container">
                                     @foreach($afterPhotos as $photo)
                                         <div class="photo-thumb-wrap">
-                                            <img src="{{ asset('storage/' . $photo->path) }}"
-                                                 onclick="openPreview('{{ asset('storage/' . $photo->path) }}')"
+                                            <img src="{{ Storage::disk('image')->url($photo->path) }}"
+                                                 onclick="openPreview('{{ Storage::disk('image')->url($photo->path) }}')"
                                                  alt="After">
                                         </div>
                                     @endforeach

@@ -315,7 +315,7 @@ class MsoTransactionController extends Controller
 
                     $file = $request->file("foto_before.$i");
 
-                    $path = $file->store('mso_photos', 'public');
+                    $path = $file->store('mso_photos', 'image');
 
                     MsoPhoto::create([
                         'mso_transaction_id' => $mso->id,
@@ -335,7 +335,7 @@ class MsoTransactionController extends Controller
 
                     $file = $request->file("foto_after.$i");
 
-                    $path = $file->store('mso_photos', 'public');
+                    $path = $file->store('mso_photos', 'image');
 
                     MsoPhoto::create([
                         'mso_transaction_id' => $mso->id,
@@ -425,8 +425,8 @@ class MsoTransactionController extends Controller
 
             // 🗑️ Hapus foto terkait dari storage dan database
             foreach ($finding->photos as $photo) {
-                if ($photo->filename && Storage::disk('public')->exists($photo->filename)) {
-                    Storage::disk('public')->delete($photo->filename);
+                if ($photo->filename && Storage::disk('image')->exists($photo->filename)) {
+                    Storage::disk('image')->delete($photo->filename);
                 }
                 $photo->delete();
             }
@@ -456,8 +456,8 @@ class MsoTransactionController extends Controller
 
             // 🗑️ HAPUS SEMUA FOTO (STORAGE + DB)
             foreach ($mso->photos as $photo) {
-                if ($photo->filename && Storage::disk('public')->exists($photo->filename)) {
-                    Storage::disk('public')->delete($photo->filename);
+                if ($photo->filename && Storage::disk('image')->exists($photo->filename)) {
+                    Storage::disk('image')->delete($photo->filename);
                 }
                 $photo->delete();
             }
@@ -465,8 +465,8 @@ class MsoTransactionController extends Controller
             // 🗑️ HAPUS FOTO YANG TERKAIT DENGAN FINDING (double safety)
             foreach ($mso->findings as $finding) {
                 foreach ($finding->photos as $photo) {
-                    if ($photo->filename && Storage::disk('public')->exists($photo->filename)) {
-                        Storage::disk('public')->delete($photo->filename);
+                    if ($photo->filename && Storage::disk('image')->exists($photo->filename)) {
+                        Storage::disk('image')->delete($photo->filename);
                     }
                     $photo->delete();
                 }
@@ -568,9 +568,9 @@ class MsoTransactionController extends Controller
             $afterUrls = [];
             foreach ($row->photos as $photo) {
                 if ($photo->type == 'before') {
-                    $beforeUrls[] = asset('storage/' . $photo->filename);
+                    $beforeUrls[] = Storage::disk('image')->url($photo->filename);
                 } elseif ($photo->type == 'after') {
-                    $afterUrls[] = asset('storage/' . $photo->filename);
+                    $afterUrls[] = Storage::disk('image')->url($photo->filename);
                 }
             }
 

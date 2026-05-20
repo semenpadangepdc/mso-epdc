@@ -918,7 +918,7 @@
                     <td>
                         @foreach($row->transaction->photos as $p)
                             @if($p->type == 'before')
-                                <img src="{{ asset('storage/'.$p->path) }}" class="table-image" alt="Before">
+                                <img src="{{ Storage::disk('image')->url($p->path) }}" class="table-image" alt="Before">
                             @endif
                         @endforeach
                     </td>
@@ -927,7 +927,7 @@
                     <td>
                         @foreach($row->transaction->photos as $p)
                             @if($p->type == 'after')
-                                <img src="{{ asset('storage/'.$p->path) }}" class="table-image" alt="After">
+                                <img src="{{ Storage::disk('image')->url($p->path) }}" class="table-image" alt="After">
                             @endif
                         @endforeach
                     </td>
