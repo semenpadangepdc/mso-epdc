@@ -150,3 +150,20 @@ Route::middleware(['auth', 'role:Admin'])
     ->group(function () {
         Route::resource('users', UserController::class);
     });
+
+// DEBUG SEMENTARA — hapus setelah selesai
+Route::get('/debug-foto', function () {
+    $photo = \App\Models\MsoPhoto::whereNotNull('path')->first();
+
+    if (!$photo) {
+        return 'Tidak ada foto di database.';
+    }
+
+    $url = Storage::disk('image')->url($photo->path);
+
+    return [
+        'path_di_db'   => $photo->path,
+        'url_generated' => $url,
+        'disk_config'  => config('filesystems.disks.image'),
+    ];
+});
