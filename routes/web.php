@@ -151,19 +151,14 @@ Route::middleware(['auth', 'role:Admin'])
         Route::resource('users', UserController::class);
     });
 
-// DEBUG SEMENTARA — hapus setelah selesai
 Route::get('/debug-foto', function () {
-    $photo = \App\Models\MsoPhoto::whereNotNull('path')->first();
+    $photo = \App\Models\MsoPhoto::whereNotNull('filename')->first();
 
-    if (!$photo) {
-        return 'Tidak ada foto di database.';
-    }
-
-    $url = Storage::disk('image')->url($photo->path);
+    if (!$photo) return 'Tidak ada foto di database.';
 
     return [
-        'path_di_db'   => $photo->path,
-        'url_generated' => $url,
-        'disk_config'  => config('filesystems.disks.image'),
+        'filename_di_db' => $photo->filename,
+        'url_generated'  => Storage::disk('image')->url($photo->filename),
+        'disk_config'    => config('filesystems.disks.image'),
     ];
 });
