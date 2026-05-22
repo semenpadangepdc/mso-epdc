@@ -324,6 +324,19 @@
         padding-top: 2rem;
         border-top: 2px solid var(--red-light);
     }
+
+    /* Perbaikan tampilan tabel temuan di mobile */
+    @media (max-width: 640px) {
+        .findings-table th:nth-child(2),
+        .findings-table td:nth-child(2) {
+            min-width: 160px; /* kolom Temuan */
+        }
+
+        .findings-table th:nth-child(3),
+        .findings-table td:nth-child(3) {
+            min-width: 200px; /* kolom Action */
+        }
+    }
 </style>
 
 <div class="max-w-6xl mx-auto p-6">
